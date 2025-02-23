@@ -48,5 +48,8 @@ public class FConstants {
         FollowerConstants.pathEndVelocityConstraint = 0.1;
         FollowerConstants.pathEndTranslationalConstraint = 0.1;
         FollowerConstants.pathEndHeadingConstraint = 0.007;
+
+        FollowerConstants.driveKalmanFilterParameters.dataCovariance = 0.5;
+        FollowerConstants.driveKalmanFilterParameters.modelCovariance = 3;
     }
 }
