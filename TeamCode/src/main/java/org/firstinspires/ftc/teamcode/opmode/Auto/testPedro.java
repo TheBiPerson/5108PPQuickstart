@@ -32,27 +32,6 @@ public class testPedro extends OpMode{
     private final Pose parkPose = new Pose(60, 98, Math.toRadians(90));    // Parking position
     private final Pose parkControlPose = new Pose(60, 98, Math.toRadians(90)); // Control point for curved path
 
-    // Team 1002
-    /*
-    private Pose startPos = new Pose(0,0, Math.toRadians(0));
-    private Pose interPos = new Pose(24, -24, Math.toRadians(90));
-    private Pose endPos = new Pose(24, 24, Math.toRadians(45));
-    */
-
-    // Team 1002 Circuit
-    /*
-    public void buildPaths() {
-        path = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(startPos), new Point(interPos)))
-                .setLinearHeadingInterpolation(startPos.getHeading(), interPos.getHeading())
-                .addPath(new BezierLine(new Point(interPos), new Point(endPos)))
-                .setLinearHeadingInterpolation(interPos.getHeading(), endPos.getHeading())
-                .addPath(new BezierLine(new Point(endPos), new Point(startPos)))
-                .setLinearHeadingInterpolation(endPos.getHeading(), startPos.getHeading())
-                .build();
-    }
-
-     */
 
     // PedroPathing
     private Path scorePreload, park;

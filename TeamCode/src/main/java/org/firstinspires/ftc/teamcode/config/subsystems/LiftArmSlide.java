@@ -18,8 +18,8 @@ public class LiftArmSlide {
     private static final double[] autoLiftArmCoefficients = {1.26,0.126,0, 12.6};
     private static final double[] autoSlideCoefficients = {1.26,0.126,0, 12.6};
 
-    public PIDFController slidePIDF;
-    public PIDFController liftArmPIDF;
+    //public PIDFController slidePIDF;
+    //public PIDFController liftArmPIDF;
     private static double slideF;
     private static double liftArmF;
     public double slideTarget = 0;
@@ -34,28 +34,34 @@ public class LiftArmSlide {
 
     public LiftArmSlide(HardwareMap hardwareMap, Telemetry telemetry) {
 
-        slidePIDF = new PIDFController(autoSlideCoefficients[0], autoSlideCoefficients[1], autoSlideCoefficients[2], autoSlideCoefficients[3]);
-        liftArmPIDF = new PIDFController(autoLiftArmCoefficients[0], autoLiftArmCoefficients[1], autoLiftArmCoefficients[2], autoLiftArmCoefficients[3]);
-        slideF = autoSlideCoefficients[3];
-        liftArmF = autoLiftArmCoefficients[3];
+
+
+
+        //slidePIDF = new PIDFController(autoSlideCoefficients[0], autoSlideCoefficients[1], autoSlideCoefficients[2], autoSlideCoefficients[3]);
+        //liftArmPIDF = new PIDFController(autoLiftArmCoefficients[0], autoLiftArmCoefficients[1], autoLiftArmCoefficients[2], autoLiftArmCoefficients[3]);
+        //slideF = autoSlideCoefficients[3];
+        //liftArmF = autoLiftArmCoefficients[3];
 
         ChainLiftHomeTouch = hardwareMap.get(TouchSensor.class, "ChainLiftHomeTouch");
         SlideHomeMagTouch = hardwareMap.get(TouchSensor.class, "SlideHomeMagTouch");
 
         ChainLiftMotor = hardwareMap.get(DcMotorEx.class, "ChainLiftMotor");
         SlideMotor = hardwareMap.get(DcMotorEx.class, "SlideMotor");
+
         ChainLiftMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         ChainLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         SlideMotor.setDirection(DcMotorEx.Direction.REVERSE);
         SlideMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
+        // PIDF control is essential to stop motor oscillation
+        ((DcMotorEx) ChainLiftMotor).setVelocityPIDFCoefficients(1.26, 0.126. 0, 12.6);
+        ((DcMotorEx) ChainLiftMotor).setPositionPIDFCoefficients(10);
 
-
-        slidePIDF.setTolerance(15);
-        liftArmPIDF.setTolerance(1);
+        //slidePIDF.setTolerance(15);
+        //liftArmPIDF.setTolerance(1);
         setSlideTarget(Math.round((float) SlideMotor.getCurrentPosition() / 42) * -1);
-        setPivotTarget(liftArmPos());
+        setLiftArmTarget(liftArmPos());
     }
 
     public void setSlideTarget(double target) {
@@ -63,7 +69,7 @@ public class LiftArmSlide {
         slidePIDF.setSetPoint(slideTarget);
     }
 
-    public void setPivotTarget(double target) {
+    public void setLiftArmTarget(double target) {
         this.liftArmTarget = Range.clip(target, 0, 121);
         liftArmPIDF.setSetPoint(liftArmTarget);
     }
