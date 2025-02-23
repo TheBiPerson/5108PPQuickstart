@@ -14,9 +14,9 @@ import com.qualcomm.robotcore.util.Range;
 public class Gripper {
 
     // Configurable positions or direction for gripper
-    public double rotationPos = 0.5;
-    public double orientationPos = 0.1;
-    public double inOutTakeDir = 0;
+    public double rotationPosition = 0.9;
+    public double orientationPosition = 0.1;
+    public double inOutTakeDirection = 0;
 
     // Servo hardware references
     private final Servo GripperRotation;
@@ -40,32 +40,32 @@ public class Gripper {
     /**
      * Sets the rotation servo to a specified position.
      * The position is clipped to the range [0.38, 0.7].
-     * @param rotateTarget The desired rotation position.
+     * @param position The desired rotation position.
      */
-    public void setRotationPosition(double rotateTarget) {
-        rotateTarget = Range.clip(rotateTarget, 0, 1);
-        GripperRotation.setPosition(rotateTarget);
-        rotationPosition = rotateTarget;
+    public void setRotationPosition(double position) {
+        position = Range.clip(position, 0, 1);
+        GripperRotation.setPosition(position);
+        rotationPosition = position;
     }
 
     /**
      * Sets the orientation servo to a specified position.
      * The position is clipped to the range [0.38, 0.7].
-     * @param orientTarget The desired orientation position.
+     * @param position The desired orientation position.
      */
-    public void setOrientationPosition(double orientTarget) {
-        orientTarget = Range.clip(orientTarget, 0, 1);
-        GripperOrientation.setPosition(orientTarget);
-        orientationPosition = orientTarget;
+    public void setOrientationPosition(double position) {
+        position = Range.clip(position, 0, 1);
+        GripperOrientation.setPosition(position);
+        orientationPosition = position;
     }
 
     /**
      * Sets the intake/outtake servo to a specified direction.
-     * @param inOutDirection The desired intake/outtake direction.
+     * @param direction The desired intake/outtake direction.
      */
-    public void setInOutTakeDirection(double inOutDirection) {
-        GripperInOutTake.setDirection(inOutDirection);
-        inOutTargetDirection = inOutDirection;
+    public void setInOutTakeDirection(double direction) {
+        GripperInOutTake.setDirection(direction);
+        inOutTakeDirection = direction;
     }
 
     /**
@@ -105,6 +105,14 @@ public class Gripper {
     }
 
     /**
+     * Sets the gripper for travel position
+     * first value for rotation, second value for orientation
+     */
+    public void setGripperTravelPosition {
+        setPositions(0.9, 0.1);
+    }
+
+    /**
      * Sets the gripper to the bucket scoring position.
      * first value for rotation, second value for orientation
      */
@@ -121,6 +129,14 @@ public class Gripper {
     public void setPrePickupPosition(double orientPos) {
         // variable orientation based on sample position
         setPositions(0, orientPos);
+    }
+
+    /**
+     * Sets the gripper for pushing specimen onto the bar
+     * first value for rotation, second value for orientation
+     */
+    public void setPushSpecimemOnBar {
+        setPositions(0.7, 0.5);
     }
 
     /**
