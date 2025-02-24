@@ -151,5 +151,58 @@ public class LiftArmSlide extends LinearOpMode {
 
     // --- Preset Position Methods ---
 
+    /**
+     * Set the lift arm and slide to home position
+     */
+    public void setLiftArmSlideHomePos() {
+        rotateLiftArm(10);
+        moveSlideArm(10);
+    }
 
+    /**
+     * Set the lift arm and slide to travel position
+     */
+    public void setLiftArmSlideTravelPos() {
+        rotateLiftArm(175);
+        moveSlideArm(100);
+    }
+
+    /**
+     * Set the lift arm and slide to prescore specimen position
+     */
+    public void setLiftArmSlidePreSpecScorePos() {
+        rotateLiftArm(475);
+        moveSlideArm(1250);
+    }
+
+    /**
+     * Set the slide to push specimen onto rung position
+     */
+    public void setSlideToPushSpecPos() {
+        moveSlideArm(1750);
+    }
+
+    /**
+     * Set lift arm and slide for wall specimen pickup
+     */
+    public void setLiftArmSlidePreWallPickup() {
+        rotateLiftArm(300);
+        moveSlideArm(750);
+    }
+
+    /**
+     * Set the slide to grab specimen from wall
+     */
+    public void setSlideForWallPickup() {
+        moveSlideArm(1150);
+    }
+
+    /**
+     * Set lift arm and slide after grabbing specimen from wall
+     */
+    public void setRemoveWallSpecimen() {
+        rotateLiftArm(500);
+        sleep(100);
+        moveSlideArm(450);
+    }
 }
