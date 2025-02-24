@@ -11,28 +11,25 @@ import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.qualcomm.robotcore.util.Range;
 
-public class LiftArmSlide extends LinearOpMode {
-    private DcMotorEx ChainLiftMotor;
-    private DcMotorEx SlideMotor;
-    private TouchSensor SlideHomeMagTouch;
-    private TouchSensor ChainLiftHomeTouch;
+public class LiftArmSlide {
+    private final DcMotorEx ChainLiftMotor;
+    private final DcMotorEx SlideMotor;
+    private final TouchSensor SlideHomeMagTouch;
+    private final TouchSensor ChainLiftHomeTouch;
 
-    private static final double[] autoLiftArmCoefficients = {1.26,0.126,0, 12.6};
-    private static final double[] autoSlideCoefficients = {1.26,0.126,0, 12.6};
-
-    //public PIDFController slidePIDF;
-    //public PIDFController liftArmPIDF;
     public double slideTarget = 0;
     public double liftArmTarget = 0;
     public boolean slidesReached;
     public boolean liftArmReached;
     // Between retracted and extended
     public boolean slidesRetracted;
-    public double liftArmPos = 0;
-    public double slidePos;
+    public int slidePos;
     public double maxSlide = 1300;
+    public int liftArmPos;
+    private final boolean debug = false;
 
     public double CHAIN_ARM_POWER = 0.5;
+    public double SLIDE_POWER = 1.0;
 
     public LiftArmSlide(HardwareMap hardwareMap, Telemetry telemetry) {
 
@@ -62,7 +59,6 @@ public class LiftArmSlide extends LinearOpMode {
         //slidePIDF.setTolerance(15);
         //liftArmPIDF.setTolerance(1);
         //setSlideTarget(Math.round((float) SlideMotor.getCurrentPosition() / 42) * -1);
-        //setLiftArmTarget(liftArmPos());
     }
 
     /**
@@ -94,43 +90,43 @@ public class LiftArmSlide extends LinearOpMode {
         ChainLiftMotor.setTargetPosition(250);
         ChainLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ChainLiftMotor.setPower(0.2);
-        // Lift Arm and Slide MUST be placed in fully retracted down position.
+        // Retract the slide to the home position.
         while (!SlideHomeMagTouch.isPressed()) {
             if (SlideHomeMagTouch.isPressed()) {
                 SlideMotor.setPower(0);
                 slidePos = 0;
-                telemetry.addData("Slide", "is retracted");
-                telemetry.update();
+                //telemetry.addData("Slide", "is retracted");
+                //telemetry.update();
                 break;
             }
             SlideMotor.setPower(-0.3);
         }
         // At this point, the slide should be home, let's finalize slide.
         SlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        SlideMotor.setTargetPosition(slideTarget);
+        SlideMotor.setTargetPosition(slidePos);
         SlideMotor.setPower(SLIDE_POWER);
         SlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         // The chain lift arm needs to be placed in the home position.
         while (!ChainLiftHomeTouch.isPressed()) {
             if (ChainLiftHomeTouch.isPressed()) {
                 ChainLiftMotor.setPower(0);
-                chainLiftPos = 0;
-                telemetry.addData("Arm", "is retracted");
-                telemetry.update();
+                liftArmPos = 0;
+                //telemetry.addData("Arm", "is retracted");
+                //telemetry.update();
                 break;
             }
             ChainLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             ChainLiftMotor.setPower(-0.4);
         }
         ChainLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ChainLiftMotor.setTargetPosition(chainLiftPos);
+        ChainLiftMotor.setTargetPosition(liftArmPos);
         ChainLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ChainLiftMotor.setPower(CHAIN_ARM_POWER);
         if (debug == true) {
-            telemetry.addData("current chain arm position", ChainLiftMotor.getCurrentPosition());
-            telemetry.addData("current slide position", SlideMotor.getCurrentPosition());
-            telemetry.update();
-            sleep(3000);
+            //telemetry.addData("current chain arm position", ChainLiftMotor.getCurrentPosition());
+            //telemetry.addData("current slide position", SlideMotor.getCurrentPosition());
+            //telemetry.update();
+            //sleep(3000);
         }
     }
 
@@ -140,7 +136,7 @@ public class LiftArmSlide extends LinearOpMode {
      * @return current slide motor position in ticks
      */
     public int getSlidePos() {
-        return Math.round((float) SlideMotor.getCurrentPosition();
+        return Math.round((float) SlideMotor.getCurrentPosition());
     }
 
     /**
@@ -204,7 +200,7 @@ public class LiftArmSlide extends LinearOpMode {
      */
     public void setRemoveWallSpecimen() {
         rotateLiftArm(500, CHAIN_ARM_POWER);
-        sleep(100);
+        //sleep(100);
         moveSlideArm(450);
     }
 }

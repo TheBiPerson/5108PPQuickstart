@@ -82,7 +82,7 @@ public class testAuto extends OpMode{
             pathTimer = new Timer();
 
             follower = new Follower(hardwareMap);
-            slides = new LiftArmSlide(hardwareMap, telemetry, true);
+            slides = new LiftArmSlide(hardwareMap, telemetry);
             follower.setStartingPose(startPos);
             buildPaths();
 
