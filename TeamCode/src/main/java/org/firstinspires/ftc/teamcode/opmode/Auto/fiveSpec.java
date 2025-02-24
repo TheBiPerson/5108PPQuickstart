@@ -159,15 +159,15 @@ public class fiveSpec extends OpMode {
                 break;
             case 1: // Place specimen onto rung
                 if (!follower.isBusy() && pathTimer.getElapsedTime() > 5) {
-                    liftArmSlide.moveSlideArm(0);
-                    liftArmSlide.rotateLiftArm(90, 0.5);
-                    gripper.setWallIntakePosition();
+                    liftArmSlide.setLiftArmSlidePreSpecScorePos();
+                    gripper.setPreSpecimenPlacement();
                     follower.followPath(combinedPush, 1,false);
                     setPathState();
             }
                 break;
             case 2: // Travel to wall specimen
                 if(!follower.isBusy()) {
+                    liftArmSlide.setLiftArmSlideTravelPos();
                     follower.followPath(inter,0.6, true);
                     setPathState(4);
                 }

@@ -32,6 +32,8 @@ public class LiftArmSlide extends LinearOpMode {
     public double slidePos;
     public double maxSlide = 1300;
 
+    public double CHAIN_ARM_POWER = 0.5;
+
     public LiftArmSlide(HardwareMap hardwareMap, Telemetry telemetry) {
 
         //slidePIDF = new PIDFController(autoSlideCoefficients[0], autoSlideCoefficients[1], autoSlideCoefficients[2], autoSlideCoefficients[3]);
@@ -155,7 +157,7 @@ public class LiftArmSlide extends LinearOpMode {
      * Set the lift arm and slide to home position
      */
     public void setLiftArmSlideHomePos() {
-        rotateLiftArm(10);
+        rotateLiftArm(10, CHAIN_ARM_POWER);
         moveSlideArm(10);
     }
 
@@ -163,7 +165,7 @@ public class LiftArmSlide extends LinearOpMode {
      * Set the lift arm and slide to travel position
      */
     public void setLiftArmSlideTravelPos() {
-        rotateLiftArm(175);
+        rotateLiftArm(175, CHAIN_ARM_POWER);
         moveSlideArm(100);
     }
 
@@ -171,7 +173,7 @@ public class LiftArmSlide extends LinearOpMode {
      * Set the lift arm and slide to prescore specimen position
      */
     public void setLiftArmSlidePreSpecScorePos() {
-        rotateLiftArm(475);
+        rotateLiftArm(475, CHAIN_ARM_POWER);
         moveSlideArm(1250);
     }
 
@@ -186,7 +188,7 @@ public class LiftArmSlide extends LinearOpMode {
      * Set lift arm and slide for wall specimen pickup
      */
     public void setLiftArmSlidePreWallPickup() {
-        rotateLiftArm(300);
+        rotateLiftArm(300, CHAIN_ARM_POWER);
         moveSlideArm(750);
     }
 
@@ -201,7 +203,7 @@ public class LiftArmSlide extends LinearOpMode {
      * Set lift arm and slide after grabbing specimen from wall
      */
     public void setRemoveWallSpecimen() {
-        rotateLiftArm(500);
+        rotateLiftArm(500, CHAIN_ARM_POWER);
         sleep(100);
         moveSlideArm(450);
     }
