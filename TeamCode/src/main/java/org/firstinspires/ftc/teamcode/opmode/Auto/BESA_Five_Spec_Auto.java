@@ -32,12 +32,12 @@ public class BESA_Five_Spec_Auto extends OpMode {
     private Pose fourthOnBar = new Pose(26,72,Math.toRadians(0));
     private Pose fifthOnBar = new Pose(26,74,Math.toRadians(0));
 
-    private Pose firstSampleLineup = new Pose(58,26,Math.toRadians(0));
-    private Pose secondSampleLineup = new Pose(58,16,Math.toRadians(0));
-    private Pose thirdSampleLineup = new Pose(58,8.5,Math.toRadians(0));
-    private Pose firstSampleback = new Pose(16,26,Math.toRadians(0));
-    private Pose secondSampleback = new Pose(16,16,Math.toRadians(0));
-    private Pose thirdSampleback = new Pose(16,8.5,Math.toRadians(0));
+    private Pose firstSampleLineup = new Pose(58,26,Math.toRadians(90));
+    private Pose secondSampleLineup = new Pose(58,16,Math.toRadians(90));
+    private Pose thirdSampleLineup = new Pose(58,8.5,Math.toRadians(90));
+    private Pose firstSampleback = new Pose(26,26,Math.toRadians(90));
+    private Pose secondSampleback = new Pose(26,16,Math.toRadians(90));
+    private Pose thirdSampleback = new Pose(26,8.5,Math.toRadians(90));
     private Pose wallPickup = new Pose(24,24,Math.toRadians(180));
 
 
@@ -71,6 +71,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
                  new Point(28,20, Point.CARTESIAN),
                  new Point(62,46, Point.CARTESIAN),
                  new Point(firstSampleLineup))
+            //).setLinearHeadingInterpolation(firstOnBar.getHeading(),firstSampleLineup.getHeading())
             ).setConstantHeadingInterpolation(firstOnBar.getHeading())
             //push first sample
             .addPath(new BezierLine(
