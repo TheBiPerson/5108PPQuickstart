@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.config.subsystems;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -9,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.qualcomm.robotcore.util.Range;
 
-public class LiftArmSlide {
+public class LiftArmSlide extends LinearOpMode {
     private DcMotorEx ChainLiftMotor;
     private DcMotorEx SlideMotor;
     private TouchSensor SlideHomeMagTouch;
@@ -20,22 +22,17 @@ public class LiftArmSlide {
 
     //public PIDFController slidePIDF;
     //public PIDFController liftArmPIDF;
-    private static double slideF;
-    private static double liftArmF;
     public double slideTarget = 0;
     public double liftArmTarget = 0;
     public boolean slidesReached;
     public boolean liftArmReached;
     // Between retracted and extended
     public boolean slidesRetracted;
-    public double liftArmPos;
-    public double liftPos;
-    public boolean pidfActive = true;
+    public double liftArmPos = 0;
+    public double slidePos;
+    public double maxSlide = 1300;
 
     public LiftArmSlide(HardwareMap hardwareMap, Telemetry telemetry) {
-
-
-
 
         //slidePIDF = new PIDFController(autoSlideCoefficients[0], autoSlideCoefficients[1], autoSlideCoefficients[2], autoSlideCoefficients[3]);
         //liftArmPIDF = new PIDFController(autoLiftArmCoefficients[0], autoLiftArmCoefficients[1], autoLiftArmCoefficients[2], autoLiftArmCoefficients[3]);
@@ -55,88 +52,104 @@ public class LiftArmSlide {
         SlideMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         // PIDF control is essential to stop motor oscillation
-        ((DcMotorEx) ChainLiftMotor).setVelocityPIDFCoefficients(1.26, 0.126. 0, 12.6);
-        ((DcMotorEx) ChainLiftMotor).setPositionPIDFCoefficients(10);
+        ChainLiftMotor.setVelocityPIDFCoefficients(1.26, 0.126, 0, 12.6);
+        ChainLiftMotor.setPositionPIDFCoefficients(10);
+        SlideMotor.setVelocityPIDFCoefficients(1.26, 0.126, 0, 12.6);
+        SlideMotor.setPositionPIDFCoefficients(10);
 
         //slidePIDF.setTolerance(15);
         //liftArmPIDF.setTolerance(1);
-        setSlideTarget(Math.round((float) SlideMotor.getCurrentPosition() / 42) * -1);
-        setLiftArmTarget(liftArmPos());
+        //setSlideTarget(Math.round((float) SlideMotor.getCurrentPosition() / 42) * -1);
+        //setLiftArmTarget(liftArmPos());
     }
 
-    public void setSlideTarget(double target) {
-        this.slideTarget = Range.clip(target, 0, 1250);
-        slidePIDF.setSetPoint(slideTarget);
+    /**
+     * Move the ChainLiftArm to a target position.
+     * Hold the LiftArm in place while performing some action.
+     */
+    public void rotateLiftArm(int armTarget, double power) {
+        ChainLiftMotor.setTargetPosition(armTarget);
+        ChainLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ChainLiftMotor.setPower(power);
+        //sleep(10);
     }
 
-    public void setLiftArmTarget(double target) {
-        this.liftArmTarget = Range.clip(target, 0, 121);
-        liftArmPIDF.setSetPoint(liftArmTarget);
+    /**
+     * Extend or retract the slide to a position
+     */
+    public void moveSlideArm(int slideTarget) {
+        SlideMotor.setTargetPosition(slideTarget);
+        SlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void update() {
-        liftPos = liftPos();
-        liftArmPos = liftArmPos();
-        /// slidePIDF.setF(slideF * Math.sin(Math.toRadians(liftArmPos)));
-        double liftPower = slidePIDF.calculate(liftPos, slideTarget);
-        slidesReached = slidePIDF.atSetPoint() || (liftPos >= slideTarget && slideTarget == 1050);
-        slidesRetracted = slideTarget <= 0 && slideLimit.isPressed();
-
-        liftArmPIDF.setF(liftArmF * Math.cos(Math.toRadians(liftArmPos)) * ((double) liftPos / 1250));
-        double pivotPower = liftArmPIDF.calculate(liftArmPos, liftArmTarget);
-        liftArmReached = liftArmPIDF.atSetPoint();
-
-        // Just make sure it gets to fully retracted if target is 0
-        if (slideTarget == 0 && !slidesReached) {
-            liftPower -= 0.1;
-        } else if (slideTarget >= 1050 && !slidesReached) {
-            liftPower += 0.6;
-        }
-
-        if (pidfActive) {
-            if (slidesRetracted) {
+    /**
+     * Retract the slide and lower chain drive to home position. To help eliminate possible mechanism
+     * conflicts, raise the arm slightly before moving the gripper and retracting the slide.
+     */
+    public void homeChainLiftArm() {
+        // Raise the chain drive assembly slightly to eliminate mechanical conflicts.
+        ChainLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        ChainLiftMotor.setTargetPosition(250);
+        ChainLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ChainLiftMotor.setPower(0.2);
+        // Lift Arm and Slide MUST be placed in fully retracted down position.
+        while (!SlideHomeMagTouch.isPressed()) {
+            if (SlideHomeMagTouch.isPressed()) {
                 SlideMotor.setPower(0);
-            } else if (liftArmPos <= 10 && slidesReached) {
-                SlideMotor.setPower(0);
-            } else {
-                SlideMotor.setPower(liftPower);
+                slidePos = 0;
+                telemetry.addData("Slide", "is retracted");
+                telemetry.update();
+                break;
             }
-        } else {
-            if (slideLimit.isPressed()) {
-                SlideMotor.setPower(0);
-                SlideMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-                slidePIDF.reset();
-                pidfActive = true;
-            } else {
-                SlideMotor.setPower(-1);
+            SlideMotor.setPower(-0.3);
+        }
+        // At this point, the slide should be home, let's finalize slide.
+        SlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        SlideMotor.setTargetPosition(slideTarget);
+        SlideMotor.setPower(SLIDE_POWER);
+        SlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        // The chain lift arm needs to be placed in the home position.
+        while (!ChainLiftHomeTouch.isPressed()) {
+            if (ChainLiftHomeTouch.isPressed()) {
+                ChainLiftMotor.setPower(0);
+                chainLiftPos = 0;
+                telemetry.addData("Arm", "is retracted");
+                telemetry.update();
+                break;
             }
+            ChainLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            ChainLiftMotor.setPower(-0.4);
         }
-
-
-        if ((slideTarget < 500 && liftArmTarget == 121 && liftArmReached) || (liftArmTarget <= 12 && liftArmReached)) {
-            pivotPower = 0;
+        ChainLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        ChainLiftMotor.setTargetPosition(chainLiftPos);
+        ChainLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ChainLiftMotor.setPower(CHAIN_ARM_POWER);
+        if (debug == true) {
+            telemetry.addData("current chain arm position", ChainLiftMotor.getCurrentPosition());
+            telemetry.addData("current slide position", SlideMotor.getCurrentPosition());
+            telemetry.update();
+            sleep(3000);
         }
-
-        pivot.setPower(pivotPower);
     }
 
-    public int liftPos() {
-        return Math.round((float) SlideMotor.getCurrentPosition() / 42) * -1;
+
+    /**
+     * Get the current position of the slide motor
+     * @return current slide motor position in ticks
+     */
+    public int getSlidePos() {
+        return Math.round((float) SlideMotor.getCurrentPosition();
     }
 
-    public int liftArmPos() {
-        // int pos = (int) (Math.round(pivotEncoder.getVoltage() / 3.2 * 360)) % 360 - 168;
-        int pos = (int) (Math.round(pivotEncoder.getVoltage() / 3.2 * 360)) % 360 - 171;
-
-        if (pos >= 360) {
-            pos -= 360;
-        } else if (pos < 0) {
-            pos += 360;
-        }
-        if (pos > 345) {
-            pos = 0;
-        }
-        return pos;
+    /**
+     * Get the current position of the chain lift arm motor
+     * @return the current position of the lift arm in ticks
+     */
+    public int getLiftArmPos() {
+        return ChainLiftMotor.getCurrentPosition();
     }
+
+    // --- Preset Position Methods ---
+
 
 }

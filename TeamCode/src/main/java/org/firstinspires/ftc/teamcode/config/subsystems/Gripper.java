@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.config.subsystems;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 /**
@@ -25,6 +26,8 @@ public class Gripper {
 
     // Override flag for sensor-based methods
     public boolean override = false;
+    // Timer
+    ElapsedTime holdTimer;
 
     /**
      * Constructs the EndEffector subsystem using the provided hardware map.
@@ -61,11 +64,11 @@ public class Gripper {
 
     /**
      * Sets the intake/outtake servo to a specified direction.
-     * @param direction The desired intake/outtake direction.
+     * @param power The desired intake/outtake direction power.
      */
-    public void setInOutTakeDirection(double direction) {
-        GripperInOutTake.setDirection(direction);
-        inOutTakeDirection = direction;
+    public void setInOutTakeDirection(double power) {
+        GripperInOutTake.setPower(power);
+        inOutTakeDirection = power;
     }
 
     /**
@@ -108,8 +111,10 @@ public class Gripper {
      * Sets the gripper for travel position
      * first value for rotation, second value for orientation
      */
-    public void setGripperTravelPosition {
-        setPositions(0.9, 0.1);
+    public void setGripperTravelPosition() {
+        GripperRotation.setPosition(0.9);
+        GripperOrientation.setPosition(0.1);
+        //setPositions(0.9, 0.1);
     }
 
     /**
@@ -132,11 +137,21 @@ public class Gripper {
     }
 
     /**
+     * Sets the gripper for pre specimen placement
+     */
+    public void setPreSpecimenPlacement() {
+        GripperRotation.setPosition(0.7);
+        GripperOrientation.setPosition(0.5);
+    }
+
+    /**
      * Sets the gripper for pushing specimen onto the bar
      * first value for rotation, second value for orientation
      */
-    public void setPushSpecimemOnBar {
-        setPositions(0.7, 0.5);
+    public void setPushSpecimemOnBar() {
+        GripperRotation.setPosition(0.7);
+        GripperOrientation.setPosition(0.5);
+        //setPositions(0.7, 0.5);
     }
 
     /**
@@ -144,7 +159,9 @@ public class Gripper {
      * first value for rotation, second value for orientation
      */
     public void setWallIntakePosition() {
-        setPositions(0.39, 0.5);
+        GripperRotation.setPosition(0.39);
+        GripperOrientation.setPosition(0.5);
+        //setPositions(0.39, 0.5);
     }
 
     /**
@@ -152,7 +169,9 @@ public class Gripper {
      * first value for rotation, second value for orientation
      */
     public void setWallSpecRemovalPosition() {
-        setPositions(0.57, 0.5);
+        GripperRotation.setPosition(0.5);
+        GripperOrientation.setPosition(0.5);
+        //setPositions(0.5, 0.5);
     }
 
     /**
@@ -167,6 +186,17 @@ public class Gripper {
      */
     public void gripperOuttake() {
         GripperInOutTake.setPower(1);
+    }
+
+    /**
+     * Dump the sample into the basket.
+     */
+    private void dumpSample(double dumpTime) {
+        holdTimer.reset();
+        while (holdTimer.seconds() < dumpTime) {
+            GripperInOutTake.setPower(-1);
+        }
+        GripperInOutTake.setPower(0);
     }
 
     /**

@@ -146,36 +146,36 @@ public class fiveSpec extends OpMode {
 
                 }
                 if (pathTimer.getElapsedTimeSeconds() > 0.2 && pathTimer.getElapsedTimeSeconds() < 1.5) {
-                    liftArmSlide.setSlideTarget(500);
+                    liftArmSlide.moveSlideArm(500);
                 }
 
                 if (pathTimer.getElapsedTimeSeconds() > 1.5) {
-                    liftArmSlide.setSlideTarget(230);
-                    if (liftArmSlide.liftPos < 250) {
+                    liftArmSlide.moveSlideArm(230);
+                    if (liftArmSlide.slidePos < 250) {
                         gripper.gripperIntake();
                         setPathState(pathState + 1);
                     }
                 }
                 break;
-            case 1:
+            case 1: // Place specimen onto rung
                 if (!follower.isBusy() && pathTimer.getElapsedTime() > 5) {
-                    liftArmSlide.setSlideTarget(0);
-                    liftArmSlide.setPivotTarget(90);
+                    liftArmSlide.moveSlideArm(0);
+                    liftArmSlide.rotateLiftArm(90, 0.5);
                     gripper.setWallIntakePosition();
                     follower.followPath(combinedPush, 1,false);
                     setPathState();
             }
                 break;
-            case 2:
+            case 2: // Travel to wall specimen
                 if(!follower.isBusy()) {
                     follower.followPath(inter,0.6, true);
                     setPathState(4);
                 }
                 break;
-            case 4:
+            case 4: // Specimen wall intake
                 if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 1.2) {
                     gripper.gripperOuttake();
-                    liftArmSlide.setSlideTarget(50);
+                    liftArmSlide.moveSlideArm(50);
                     setPathState(5);
                 }
                 break;
@@ -185,19 +185,19 @@ public class fiveSpec extends OpMode {
                 }
 
                 if (pathTimer.getElapsedTimeSeconds() > 0.3 && pathTimer.getElapsedTimeSeconds() < 1) {
-                    liftArmSlide.setSlideTarget(110);
-                    gripper.setGripperHomePosition(); // Adjust claw for scoring
+                    liftArmSlide.moveSlideArm(110);
+                    gripper.setGripperHomePosition(); // Adjust gripper for scoring
                          // Set initial slide position
                 }
                 
 
                 if (pathTimer.getElapsedTimeSeconds() > 1.2 && pathTimer.getElapsedTimeSeconds() < 2.5) {
-                    liftArmSlide.setSlideTarget(460); // Lift slide to scoring position
+                    liftArmSlide.moveSlideArm(460); // Lift slide to scoring position
                 }
 
                 if (pathTimer.getElapsedTimeSeconds() > 3) {
-                    liftArmSlide.setSlideTarget(230); // Lower slide slightly for object release
-                    if (liftArmSlide.liftPos < 250) {
+                    liftArmSlide.moveSlideArm(230); // Lower slide slightly for object release
+                    if (liftArmSlide.slidePos < 250) {
                         gripper.gripperIntake(); // Release object
                         setPathState(pathState + 1); // Transition to return state
                     }
@@ -206,8 +206,8 @@ public class fiveSpec extends OpMode {
 
             case 6:
                 if (!follower.isBusy()) {
-                    liftArmSlide.setSlideTarget(0); // Reset slide to initial position
-                    liftArmSlide.setPivotTarget(90); // Reset lift arm to initial position
+                    liftArmSlide.moveSlideArm(0); // Reset slide to initial position
+                    liftArmSlide.rotateLiftArm(90, 0.5); // Reset lift arm to initial position
                     gripper.setWallIntakePosition(); // Prepare gripper for intake
                     follower.followPath(return1, true); // Follow return1 path
                     setPathState(pathState + 1); // Transition to the next scoring path
@@ -228,8 +228,8 @@ public class fiveSpec extends OpMode {
             case 11:
                 cycle();
                 if (pathTimer.getElapsedTimeSeconds() > 4.4) {
-                    liftArmSlide.setSlideTarget(230);
-                    if (liftArmSlide.liftPos < 250) {
+                    liftArmSlide.moveSlideArm(230);
+                    if (liftArmSlide.slidePos < 250) {
                         gripper.gripperIntake();
                         setPathState(pathState + 1); // Transition to next return
                     }
@@ -263,21 +263,21 @@ public class fiveSpec extends OpMode {
         }
         if (pathTimer.getElapsedTimeSeconds() > 1.8 && pathTimer.getElapsedTimeSeconds() < 2.3) {
             gripper.gripperOuttake();
-            liftArmSlide.setSlideTarget(110);
+            liftArmSlide.moveSlideArm(110);
         }
 
         if (pathTimer.getElapsedTimeSeconds() > 2.3 && pathTimer.getElapsedTimeSeconds() < 3) {
-            gripper.setSpecScore();
-            liftArmSlide.setSlideTarget(100);
+            gripper.setPreSpecimenPlacement();
+            liftArmSlide.moveSlideArm(100);
         }
 
         if (pathTimer.getElapsedTimeSeconds() > 3.2 && pathTimer.getElapsedTimeSeconds() < 4.3) {
-            liftArmSlide.setSlideTarget(460);
+            liftArmSlide.moveSlideArm(460);
         }
 
         if (pathTimer.getElapsedTimeSeconds() > 4.6) {
-            liftArmSlide.setSlideTarget(230);
-            if (liftArmSlide.liftPos < 250) {
+            liftArmSlide.moveSlideArm(230);
+            if (liftArmSlide.slidePos < 250) {
                 gripper.gripperIntake();
                 setPathState(pathState + 1); // Transition to next return
             }
@@ -286,8 +286,8 @@ public class fiveSpec extends OpMode {
 
     private void intake() {
         if (!follower.isBusy() || follower.getVelocityMagnitude() < 0.05) {
-            liftArmSlide.setSlideTarget(0);
-            liftArmSlide.setPivotTarget(90);
+            liftArmSlide.moveSlideArm(0);
+            liftArmSlide.rotateLiftArm(90, 0.5);
             gripper.gripperOuttake();
             gripper.setWallIntakePosition();
             follower.followPath(return2, false); // Follow return2 path
@@ -298,7 +298,7 @@ public class fiveSpec extends OpMode {
     private void preCycle() {
         if (!follower.isBusy()) {
             gripper.gripperOuttake();
-            liftArmSlide.setSlideTarget(50);
+            liftArmSlide.moveSlideArm(50);
             setPathState(pathState + 1);
         }
     }
@@ -316,9 +316,7 @@ public class fiveSpec extends OpMode {
 
         telemetry.update();
 
-
-
-        liftArmSlide.update();
+        liftArmSlide.homeChainLiftArm();
 
         autonomousPathUpdate();
     }
@@ -341,24 +339,23 @@ public class fiveSpec extends OpMode {
         follower.setStartingPose(startingPose);
         follower.setMaxPower(1);
 
-        liftArmSlide = new LiftArmSlide(hardwareMap, telemetry, true);
+        liftArmSlide = new LiftArmSlide(hardwareMap, telemetry);
         gripper = new Gripper(hardwareMap);
 
         gripper.setGripperHomePosition();
-        liftArmSlide.setPivotTarget(90);
-        liftArmSlide.setSlideTarget(50);
+        liftArmSlide.homeChainLiftArm();
 
         // Build our newly incorporated multi-step path:
         buildPaths();
 
-        if (!liftArmSlide.slideLimit.isPressed()) {
-            throw new IllegalArgumentException("Zero slides before init");
-        }
+        //if (!liftArmSlide.slideLimit.isPressed()) {
+          //  throw new IllegalArgumentException("Zero slides before init");
+        //}
     }
 
     @Override
     public void start() {
-        gripper.setSpecScore();
+        gripper.setGripperHomePosition();
         pathTimer.resetTimer();
         setPathState(0);
     }
