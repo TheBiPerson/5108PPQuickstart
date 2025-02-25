@@ -24,13 +24,11 @@ public class Gripper {
     private final Servo GripperOrientation;
     private final CRServo GripperInOutTake;
 
-    // Override flag for sensor-based methods
-    public boolean override = false;
     // Timer
     ElapsedTime holdTimer;
 
     /**
-     * Constructs the EndEffector subsystem using the provided hardware map.
+     * Constructs the Gripper subsystem using the provided hardware map.
      * @param hardwareMap The hardware map from the op mode.
      */
     public Gripper(HardwareMap hardwareMap) {
@@ -41,7 +39,7 @@ public class Gripper {
     }
 
     /**
-     * Sets the rotation servo to a specified position.
+     * Sets the Rotation servo to a specified position.
      * The position is clipped to the range [0.38, 0.7].
      * @param position The desired rotation position.
      */
@@ -52,7 +50,7 @@ public class Gripper {
     }
 
     /**
-     * Sets the orientation servo to a specified position.
+     * Sets the Orientation servo to a specified position.
      * The position is clipped to the range [0.38, 0.7].
      * @param position The desired orientation position.
      */
@@ -63,7 +61,7 @@ public class Gripper {
     }
 
     /**
-     * Sets the intake/outtake servo to a specified direction.
+     * Sets the intake/outtake servo to a specified (power) direction.
      * @param power The desired intake/outtake direction power.
      */
     public void setInOutTakeDirection(double power) {

@@ -21,8 +21,8 @@ import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Timer;
 
-@Autonomous(name = "fiveSpec", group = "auto", preselectTeleOp = "Teleop")
-public class fiveSpec extends OpMode {
+@Autonomous(name = "SCB_FiveSpec_Auto", group = "auto")
+public class SCB_FiveSpec_Auto extends OpMode {
 
     private ElapsedTime timer = new ElapsedTime();
     private Follower follower;
@@ -31,10 +31,11 @@ public class fiveSpec extends OpMode {
     private Gripper gripper;
     private int pathState;
 
-    private PathChain preload, pushSample1Path, pushSample2Path, pushSample3Path, combinedPush, score1, return1, score2, return2, score3, return3, score4, return4, shift, inter;
-    private Pose startingPose =  new Pose   (7, 65, Math.toRadians(0));
+    private PathChain preload, combinedPush, intake, score1, return1, score2, return2;
+//    private PathChain preload, combinedPush, intake, score1, return1, score2, return2, score3, return3, score4, return4, shift;
+    private Pose startingPose =  new Pose   (8.5, 66, Math.toRadians(0));
 
-    private double wall_intake = 7.5;
+    private double wall_intakeX = 18;
     private double subX = 39;
 
 
@@ -46,62 +47,62 @@ public class fiveSpec extends OpMode {
         // Preload path (Line 1)
         preload = follower.pathBuilder()
                 .addPath(new BezierLine(
-                        new Point(new Pose(7.338, 65.859, Math.toRadians(0))),
-                        new Point(new Pose(40, 65.859, Math.toRadians(0)))))
+                        new Point(new Pose(8.5, 66, Math.toRadians(0))),
+                        new Point(new Pose(26.0, 66.0, Math.toRadians(0)))))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
+        // Path to push three samples to obs zone
         combinedPush = follower.pathBuilder()
                 .addPath(new BezierCurve(
-                        new Point(new Pose(40.000, 65.859, Math.toRadians(0))),
-                        new Point(new Pose(34.000, 67.000, Math.toRadians(0))),
-                        new Point(new Pose(0.000, 48.000, Math.toRadians(0))),
-                        new Point(new Pose(50, 30.000, Math.toRadians(0)))))
+                        new Point(new Pose(26.0, 66.0, Math.toRadians(90))),
+                        new Point(new Pose(35.000, 53.000, Math.toRadians(90))),
+                        new Point(new Pose(15.000, 37.000, Math.toRadians(90))),
+                        new Point(new Pose(58, 30.000, Math.toRadians(90)))))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .addPath(new BezierCurve(
-                        new Point(new Pose(50, 30.000, Math.toRadians(0))),
+                        new Point(new Pose(58, 30.000, Math.toRadians(0))),
                         new Point(new Pose(65.000, 20.000, Math.toRadians(0))),
                         new Point(new Pose(22, 20.000, Math.toRadians(0)))))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .addPath(new BezierCurve(
                         new Point(new Pose(22, 20.000, Math.toRadians(0))),
                         new Point(new Pose(65.000, 28, Math.toRadians(0))),
-                        new Point(new Pose(50, 13.5, Math.toRadians(0)))))
+                        new Point(new Pose(58, 13.5, Math.toRadians(0)))))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .addPath(new BezierLine(
-                        new Point(new Pose(50, 13.5, Math.toRadians(0))),
+                        new Point(new Pose(58, 13.5, Math.toRadians(0))),
                         new Point(new Pose(22, 13.5, Math.toRadians(0)))))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .addPath(new BezierCurve(
                         new Point(new Pose(22, 13.5, Math.toRadians(0))),
                         new Point(new Pose(65.000, 16.250, Math.toRadians(0))),
-                        new Point(new Pose(50, 7.5, Math.toRadians(0)))))
+                        new Point(new Pose(58, 8.5, Math.toRadians(0)))))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addPath(
-                        // Line 1
-                        new BezierLine(
-                                new Point(50.000, 7.5, Point.CARTESIAN),
-                                new Point(19, 7.5, Point.CARTESIAN)
+                .addPath(new BezierLine(
+                         new Point(58.000, 8.5, Point.CARTESIAN),
+                         new Point(19, 7.5, Point.CARTESIAN)
                         )
                 )
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
-        inter = follower.pathBuilder()
-                .addPath(
-                        // Line 2
-                        new BezierCurve(
-                                new Point(19, 7.5, Point.CARTESIAN),
-                                new Point(17.3, 13, Point.CARTESIAN),
-                                new Point(wall_intake, 28, Point.CARTESIAN)
+                // The robot is now positioned in the obs zone after pushing three samples
+
+        // This segment moves the robot to the wall pickup location and rotates to 180 deg.
+        intake = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                         new Point(19, 7.5, Point.CARTESIAN),
+                         new Point(17.3, 13, Point.CARTESIAN),
+                         new Point(wall_intakeX, 28, Point.CARTESIAN)
                         )
                 )
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
         score1 = follower.pathBuilder()
                 .addPath(new BezierCurve(
-                        new Point(new Pose(wall_intake, 28, Math.toRadians(0))),
+                        new Point(new Pose(wall_intakeX, 28, Math.toRadians(0))),
                         new Point(new Pose(subX, 13, Math.toRadians(0))),
-                        new Point(new Pose(wall_intake, 70, Math.toRadians(0))),
+                        new Point(new Pose(wall_intakeX, 70, Math.toRadians(0))),
                         new Point(new Pose(subX, 70, Math.toRadians(0)))))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
@@ -109,17 +110,17 @@ public class fiveSpec extends OpMode {
                 .addPath(
                     new BezierCurve(
                         new Point(subX, 70, Point.CARTESIAN),
-                        new Point(wall_intake, 70, Point.CARTESIAN),
+                        new Point(wall_intakeX, 70, Point.CARTESIAN),
                         new Point(subX, 28, Point.CARTESIAN),
-                        new Point(wall_intake, 28.000, Point.CARTESIAN)))
+                        new Point(wall_intakeX, 28.000, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
         score2 = follower.pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Point(wall_intake, 28.000, Point.CARTESIAN),
+                                new Point(wall_intakeX, 28.000, Point.CARTESIAN),
                                 new Point(subX, 28, Point.CARTESIAN),
-                                new Point(wall_intake, 68, Point.CARTESIAN),
+                                new Point(wall_intakeX, 68, Point.CARTESIAN),
                                 new Point(subX, 68.000, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .addPath(new BezierLine(new Point(subX, 68, Point.CARTESIAN), new Point(subX, 68.5, Point.CARTESIAN)))
@@ -128,10 +129,10 @@ public class fiveSpec extends OpMode {
         return2 = follower.pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Point(subX, 68.5, Point.CARTESIAN),
-                                new Point(wall_intake, 66, Point.CARTESIAN),
+                                new Point(subX, 68.0, Point.CARTESIAN),
+                                new Point(wall_intakeX, 66, Point.CARTESIAN),
                                 new Point(subX, 28, Point.CARTESIAN),
-                                new Point(wall_intake, 28.000, Point.CARTESIAN)))
+                                new Point(wall_intakeX, 28.000, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
     }
@@ -142,40 +143,40 @@ public class fiveSpec extends OpMode {
                 if(!follower.isBusy()) {
                     // Start following our newly built path
                     follower.followPath(preload, 1, true);
-                    gripper.setGripperHomePosition();
+                    //gripper.setGripperHomePosition();
 
                 }
                 if (pathTimer.getElapsedTimeSeconds() > 0.2 && pathTimer.getElapsedTimeSeconds() < 1.5) {
-                    liftArmSlide.moveSlideArm(500);
+                    //liftArmSlide.moveSlideArm(500);
                 }
 
                 if (pathTimer.getElapsedTimeSeconds() > 1.5) {
-                    liftArmSlide.moveSlideArm(230);
+                    //liftArmSlide.moveSlideArm(230);
                     if (liftArmSlide.slidePos < 250) {
-                        gripper.gripperIntake();
+                        //gripper.gripperIntake();
                         setPathState(pathState + 1);
                     }
                 }
                 break;
             case 1: // Place specimen onto rung
                 if (!follower.isBusy() && pathTimer.getElapsedTime() > 5) {
-                    liftArmSlide.setLiftArmSlidePreSpecScorePos();
-                    gripper.setPreSpecimenPlacement();
+                    //liftArmSlide.setLiftArmSlidePreSpecScorePos();
+                    //gripper.setPreSpecimenPlacement();
                     follower.followPath(combinedPush, 1,false);
                     setPathState();
             }
                 break;
             case 2: // Travel to wall specimen
                 if(!follower.isBusy()) {
-                    liftArmSlide.setLiftArmSlideTravelPos();
-                    follower.followPath(inter,0.6, true);
+                    //liftArmSlide.setLiftArmSlideTravelPos();
+                    follower.followPath(intake,0.6, true);
                     setPathState(4);
                 }
                 break;
             case 4: // Specimen wall intake
                 if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 1.2) {
-                    gripper.gripperOuttake();
-                    liftArmSlide.moveSlideArm(50);
+                    //gripper.gripperOuttake();
+                    //liftArmSlide.moveSlideArm(50);
                     setPathState(5);
                 }
                 break;
@@ -185,20 +186,20 @@ public class fiveSpec extends OpMode {
                 }
 
                 if (pathTimer.getElapsedTimeSeconds() > 0.3 && pathTimer.getElapsedTimeSeconds() < 1) {
-                    liftArmSlide.moveSlideArm(110);
-                    gripper.setGripperHomePosition(); // Adjust gripper for scoring
+                    //liftArmSlide.moveSlideArm(110);
+                    //gripper.setGripperHomePosition(); // Adjust gripper for scoring
                          // Set initial slide position
                 }
                 
 
                 if (pathTimer.getElapsedTimeSeconds() > 1.2 && pathTimer.getElapsedTimeSeconds() < 2.5) {
-                    liftArmSlide.moveSlideArm(460); // Lift slide to scoring position
+                    //liftArmSlide.moveSlideArm(460); // Lift slide to scoring position
                 }
 
                 if (pathTimer.getElapsedTimeSeconds() > 3) {
-                    liftArmSlide.moveSlideArm(230); // Lower slide slightly for object release
+                    //liftArmSlide.moveSlideArm(230); // Lower slide slightly for object release
                     if (liftArmSlide.slidePos < 250) {
-                        gripper.gripperIntake(); // Release object
+                        //gripper.gripperIntake(); // Release object
                         setPathState(pathState + 1); // Transition to return state
                     }
                 }
@@ -206,9 +207,9 @@ public class fiveSpec extends OpMode {
 
             case 6:
                 if (!follower.isBusy()) {
-                    liftArmSlide.moveSlideArm(0); // Reset slide to initial position
-                    liftArmSlide.rotateLiftArm(90, 0.5); // Reset lift arm to initial position
-                    gripper.setWallIntakePosition(); // Prepare gripper for intake
+                    //liftArmSlide.moveSlideArm(0); // Reset slide to initial position
+                    //liftArmSlide.rotateLiftArm(90, 0.5); // Reset lift arm to initial position
+                    //gripper.setWallIntakePosition(); // Prepare gripper for intake*/
                     follower.followPath(return1, true); // Follow return1 path
                     setPathState(pathState + 1); // Transition to the next scoring path
                 }
@@ -228,9 +229,9 @@ public class fiveSpec extends OpMode {
             case 11:
                 cycle();
                 if (pathTimer.getElapsedTimeSeconds() > 4.4) {
-                    liftArmSlide.moveSlideArm(230);
+                    //liftArmSlide.moveSlideArm(230);
                     if (liftArmSlide.slidePos < 250) {
-                        gripper.gripperIntake();
+                        //gripper.gripperIntake();
                         setPathState(pathState + 1); // Transition to next return
                     }
                 }
@@ -355,7 +356,7 @@ public class fiveSpec extends OpMode {
 
     @Override
     public void start() {
-        gripper.setGripperHomePosition();
+        //gripper.setGripperHomePosition();
         pathTimer.resetTimer();
         setPathState(0);
     }

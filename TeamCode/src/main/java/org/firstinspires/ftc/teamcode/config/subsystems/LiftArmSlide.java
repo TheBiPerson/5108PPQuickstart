@@ -1,22 +1,25 @@
 package org.firstinspires.ftc.teamcode.config.subsystems;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import com.qualcomm.robotcore.util.Range;
+
+/**
+ * The LiftArmSlide controls the chain lift arm and the slide extension.
+ * It provides preset methods such as arm rotation or slide location.
+ * In addition, the lift arm and slide home method is included here.
+ */
 
 public class LiftArmSlide {
-    private static DcMotorEx ChainLiftMotor;
-    private static DcMotorEx SlideMotor;
-    private static TouchSensor SlideHomeMagTouch;
-    private static TouchSensor ChainLiftHomeTouch;
+    public DcMotorEx ChainLiftMotor;
+    public DcMotorEx SlideMotor;
+    public TouchSensor SlideHomeMagTouch;
+    public TouchSensor ChainLiftHomeTouch;
 
     public double slideTarget = 0;
     public double liftArmTarget = 0;
@@ -24,20 +27,15 @@ public class LiftArmSlide {
     public boolean liftArmReached;
     // Between retracted and extended
     public boolean slidesRetracted;
-    public static int slidePos;
-    public static double maxSlide = 1300;
-    public static int liftArmPos;
-    private static boolean debug = false;
+    public int slidePos;
+    public double maxSlide = 1300;
+    public int liftArmPos;
+    private boolean debug = false;
 
     public static double CHAIN_ARM_POWER = 0.5;
     public static double SLIDE_POWER = 1.0;
 
     public LiftArmSlide(HardwareMap hardwareMap, Telemetry telemetry) {
-
-        //slidePIDF = new PIDFController(autoSlideCoefficients[0], autoSlideCoefficients[1], autoSlideCoefficients[2], autoSlideCoefficients[3]);
-        //liftArmPIDF = new PIDFController(autoLiftArmCoefficients[0], autoLiftArmCoefficients[1], autoLiftArmCoefficients[2], autoLiftArmCoefficients[3]);
-        //slideF = autoSlideCoefficients[3];
-        //liftArmF = autoLiftArmCoefficients[3];
 
         ChainLiftHomeTouch = hardwareMap.get(TouchSensor.class, "ChainLiftHomeTouch");
         SlideHomeMagTouch = hardwareMap.get(TouchSensor.class, "SlideHomeMagTouch");
@@ -56,10 +54,6 @@ public class LiftArmSlide {
         ChainLiftMotor.setPositionPIDFCoefficients(10);
         SlideMotor.setVelocityPIDFCoefficients(1.26, 0.126, 0, 12.6);
         SlideMotor.setPositionPIDFCoefficients(10);
-
-        //slidePIDF.setTolerance(15);
-        //liftArmPIDF.setTolerance(1);
-        //setSlideTarget(Math.round((float) SlideMotor.getCurrentPosition() / 42) * -1);
     }
 
     /**
@@ -85,7 +79,7 @@ public class LiftArmSlide {
      * Retract the slide and lower chain drive to home position. To help eliminate possible mechanism
      * conflicts, raise the arm slightly before moving the gripper and retracting the slide.
      */
-    public static void homeChainLiftArm() {
+    public void homeChainLiftArm() {
         // Raise the chain drive assembly slightly to eliminate mechanical conflicts.
         ChainLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ChainLiftMotor.setTargetPosition(250);
@@ -137,7 +131,7 @@ public class LiftArmSlide {
      * @return current slide motor position in ticks
      */
     public int getSlidePos() {
-        return Math.round((float) SlideMotor.getCurrentPosition());
+        return SlideMotor.getCurrentPosition();
     }
 
     /**
@@ -150,55 +144,41 @@ public class LiftArmSlide {
 
     // --- Preset Position Methods ---
 
-    /**
-     * Set the lift arm and slide to home position
-     */
+    // Set the lift arm and slide to home position
     public void setLiftArmSlideHomePos() {
         rotateLiftArm(10, CHAIN_ARM_POWER);
         moveSlideArm(10);
     }
 
-    /**
-     * Set the lift arm and slide to travel position
-     */
+    // Set the lift arm and slide to travel position
     public void setLiftArmSlideTravelPos() {
         rotateLiftArm(175, CHAIN_ARM_POWER);
         moveSlideArm(100);
     }
 
-    /**
-     * Set the lift arm and slide to prescore specimen position
-     */
+    // Set the lift arm and slide to prescore specimen position
     public void setLiftArmSlidePreSpecScorePos() {
         rotateLiftArm(475, CHAIN_ARM_POWER);
         moveSlideArm(1250);
     }
 
-    /**
-     * Set the slide to push specimen onto rung position
-     */
+    // Set the slide to push specimen onto rung position
     public void setSlideToPushSpecPos() {
         moveSlideArm(1750);
     }
 
-    /**
-     * Set lift arm and slide for wall specimen pickup
-     */
+    // Set lift arm and slide for wall specimen pickup
     public void setLiftArmSlidePreWallPickup() {
         rotateLiftArm(300, CHAIN_ARM_POWER);
         moveSlideArm(750);
     }
 
-    /**
-     * Set the slide to grab specimen from wall
-     */
+    // Set the slide to grab specimen from wall
     public void setSlideForWallPickup() {
         moveSlideArm(1150);
     }
 
-    /**
-     * Set lift arm and slide after grabbing specimen from wall
-     */
+    // Set lift arm and slide after grabbing specimen from wall
     public void setRemoveWallSpecimen() {
         rotateLiftArm(500, CHAIN_ARM_POWER);
         //sleep(100);
