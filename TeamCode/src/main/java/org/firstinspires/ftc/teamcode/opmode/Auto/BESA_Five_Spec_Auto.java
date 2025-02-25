@@ -384,7 +384,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
     private RevBlinkinLedDriver BlinkinLEDCtrl;
     private double colorGain = 1.05;
 
-    public ColorBlink (HardwareMap hardwareMap) {
+    public void ColorBlink (HardwareMap hardwareMap) {
         // Map color devices
         BlinkinLEDCtrl = hardwareMap.get(RevBlinkinLedDriver.class, "BlinkinLEDCtrl");
         GripperColorSensor = hardwareMap.get(ColorSensor.class, "GripperColorSensor");
