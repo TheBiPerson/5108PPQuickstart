@@ -56,7 +56,6 @@ public class BESA_Five_Spec_Auto extends OpMode {
     }
     @Override
     public void init() {
-        LiftArmSlide.homeChainLiftArm();
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startingPose);
