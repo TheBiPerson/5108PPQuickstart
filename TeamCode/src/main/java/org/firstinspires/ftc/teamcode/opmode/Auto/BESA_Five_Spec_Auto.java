@@ -17,8 +17,7 @@ import pedroPathing.constants.LConstants;
 @Autonomous(name = "BESA_Five_Spec_Auto", group = "auto", preselectTeleOp = "Teleop")
 public class BESA_Five_Spec_Auto extends OpMode {
 
-    private int barX = 30;
-    private int samplePushX = 16;
+
     private Follower follower;
     private Path scorePreload;
     private PathChain threeSamplePush;

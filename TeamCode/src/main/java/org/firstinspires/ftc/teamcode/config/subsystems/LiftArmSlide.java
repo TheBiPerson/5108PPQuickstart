@@ -13,10 +13,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.qualcomm.robotcore.util.Range;
 
 public class LiftArmSlide {
-    private final DcMotorEx ChainLiftMotor;
-    private final DcMotorEx SlideMotor;
-    private final TouchSensor SlideHomeMagTouch;
-    private final TouchSensor ChainLiftHomeTouch;
+    private static DcMotorEx ChainLiftMotor;
+    private static DcMotorEx SlideMotor;
+    private static TouchSensor SlideHomeMagTouch;
+    private static TouchSensor ChainLiftHomeTouch;
 
     public double slideTarget = 0;
     public double liftArmTarget = 0;
@@ -24,13 +24,13 @@ public class LiftArmSlide {
     public boolean liftArmReached;
     // Between retracted and extended
     public boolean slidesRetracted;
-    public int slidePos;
-    public double maxSlide = 1300;
-    public int liftArmPos;
-    private final boolean debug = false;
+    public static int slidePos;
+    public static double maxSlide = 1300;
+    public static int liftArmPos;
+    private static boolean debug = false;
 
-    public double CHAIN_ARM_POWER = 0.5;
-    public double SLIDE_POWER = 1.0;
+    public static double CHAIN_ARM_POWER = 0.5;
+    public static double SLIDE_POWER = 1.0;
 
     public LiftArmSlide(HardwareMap hardwareMap, Telemetry telemetry) {
 
@@ -85,7 +85,7 @@ public class LiftArmSlide {
      * Retract the slide and lower chain drive to home position. To help eliminate possible mechanism
      * conflicts, raise the arm slightly before moving the gripper and retracting the slide.
      */
-    public void homeChainLiftArm() {
+    public static void homeChainLiftArm() {
         // Raise the chain drive assembly slightly to eliminate mechanical conflicts.
         ChainLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ChainLiftMotor.setTargetPosition(250);
@@ -123,7 +123,7 @@ public class LiftArmSlide {
         ChainLiftMotor.setTargetPosition(liftArmPos);
         ChainLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ChainLiftMotor.setPower(CHAIN_ARM_POWER);
-        if (debug == true) {
+        if (debug) {
             telemetry.addData("current chain arm position", ChainLiftMotor.getCurrentPosition());
             telemetry.addData("current slide position", SlideMotor.getCurrentPosition());
             telemetry.update();
