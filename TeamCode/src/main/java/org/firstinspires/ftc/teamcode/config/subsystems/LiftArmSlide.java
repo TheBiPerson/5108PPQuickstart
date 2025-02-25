@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.config.subsystems;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -95,8 +96,8 @@ public class LiftArmSlide {
             if (SlideHomeMagTouch.isPressed()) {
                 SlideMotor.setPower(0);
                 slidePos = 0;
-                //telemetry.addData("Slide", "is retracted");
-                //telemetry.update();
+                telemetry.addData("Slide", "is retracted");
+                telemetry.update();
                 break;
             }
             SlideMotor.setPower(-0.3);
@@ -111,8 +112,8 @@ public class LiftArmSlide {
             if (ChainLiftHomeTouch.isPressed()) {
                 ChainLiftMotor.setPower(0);
                 liftArmPos = 0;
-                //telemetry.addData("Arm", "is retracted");
-                //telemetry.update();
+                telemetry.addData("Arm", "is retracted");
+                telemetry.update();
                 break;
             }
             ChainLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -123,9 +124,9 @@ public class LiftArmSlide {
         ChainLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ChainLiftMotor.setPower(CHAIN_ARM_POWER);
         if (debug == true) {
-            //telemetry.addData("current chain arm position", ChainLiftMotor.getCurrentPosition());
-            //telemetry.addData("current slide position", SlideMotor.getCurrentPosition());
-            //telemetry.update();
+            telemetry.addData("current chain arm position", ChainLiftMotor.getCurrentPosition());
+            telemetry.addData("current slide position", SlideMotor.getCurrentPosition());
+            telemetry.update();
             //sleep(3000);
         }
     }
