@@ -10,7 +10,7 @@ import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
+import org.firstinspires.ftc.teamcode.config.subsystems.LiftArmSlide;
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
@@ -57,6 +57,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
     }
     @Override
     public void init() {
+        LiftArmSlide.homeChainLiftArm();
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startingPose);
