@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmode.Auto;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import android.graphics.Color;
 
 import com.pedropathing.follower.Follower;
@@ -22,13 +20,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
@@ -37,7 +33,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
 
 //*************************** Begin LiftArm and Slide ****************************************
     /**
-     * The LiftArmSlide controls the chain lift arm and the slide extension.
+     * The initLiftArmSlide controls the chain lift arm and the slide extension.
      * It provides preset methods such as arm rotation or slide location and
      * other associated lift arm and slide variables, declarations, and methods..
      * In addition, the lift arm and slide home method is included here.
@@ -55,16 +51,15 @@ public class BESA_Five_Spec_Auto extends OpMode {
     private int liftArmPos;
     private boolean debug = false;
 
-    private double CHAIN_ARM_POWER = 0.5;
+    private double CHAIN_ARM_POWER = 1.0;
     private double SLIDE_POWER = 1.0;
 
-    public void LiftArmSlide (HardwareMap hardwareMap, Telemetry telemetry) {
 
-        ChainLiftHomeTouch = hardwareMap.get(TouchSensor.class, "ChainLiftHomeTouch");
-        SlideHomeMagTouch = hardwareMap.get(TouchSensor.class, "SlideHomeMagTouch");
-
+    public void initLiftArmSlide() {
         ChainLiftMotor = hardwareMap.get(DcMotorEx.class, "ChainLiftMotor");
         SlideMotor = hardwareMap.get(DcMotorEx.class, "SlideMotor");
+        SlideHomeMagTouch = hardwareMap.get(TouchSensor.class, "SlideHomeMagTouch");
+        ChainLiftHomeTouch = hardwareMap.get(TouchSensor.class, "ChainLiftHomeTouch");
 
         ChainLiftMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         ChainLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -82,14 +77,14 @@ public class BESA_Five_Spec_Auto extends OpMode {
     // Move the ChainLiftArm to a target position.
     private void rotateLiftArm(int armTarget, double power) {
         ChainLiftMotor.setTargetPosition(armTarget);
-        ChainLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //ChainLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ChainLiftMotor.setPower(power);
     }
 
     // Extend or retract the slide to a position
     private void moveSlideArm(int slideTarget) {
         SlideMotor.setTargetPosition(slideTarget);
-        SlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+       //SlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     /**
@@ -107,8 +102,8 @@ public class BESA_Five_Spec_Auto extends OpMode {
             if (SlideHomeMagTouch.isPressed()) {
                 SlideMotor.setPower(0);
                 slidePos = 0;
-                telemetry.addData("Slide", "is retracted");
-                telemetry.update();
+                //telemetry.addData("Slide", "is retracted");
+                //telemetry.update();
                 break;
             }
             SlideMotor.setPower(-0.3);
@@ -123,8 +118,8 @@ public class BESA_Five_Spec_Auto extends OpMode {
             if (ChainLiftHomeTouch.isPressed()) {
                 ChainLiftMotor.setPower(0);
                 liftArmPos = 0;
-                telemetry.addData("Arm", "is retracted");
-                telemetry.update();
+                //telemetry.addData("Arm", "is retracted");
+                //telemetry.update();
                 break;
             }
             ChainLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -135,9 +130,9 @@ public class BESA_Five_Spec_Auto extends OpMode {
         ChainLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ChainLiftMotor.setPower(CHAIN_ARM_POWER);
         if (debug) {
-            telemetry.addData("current chain arm position", ChainLiftMotor.getCurrentPosition());
-            telemetry.addData("current slide position", SlideMotor.getCurrentPosition());
-            telemetry.update();
+            //telemetry.addData("current chain arm position", ChainLiftMotor.getCurrentPosition());
+            //telemetry.addData("current slide position", SlideMotor.getCurrentPosition());
+            //telemetry.update();
         }
     }
 
@@ -146,7 +141,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
      * @return current slide motor position in ticks
      */
     public int getSlidePos() {
-        return Math.round((float) SlideMotor.getCurrentPosition());
+        return SlideMotor.getCurrentPosition();
     }
 
     /**
@@ -157,7 +152,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
         return ChainLiftMotor.getCurrentPosition();
     }
 
-    // ------------- LiftArmSlide Preset Position Methods -------------------
+    // ------------- initLiftArmSlide Preset Position Methods -------------------
 
     // Set the lift arm and slide to home position
     public void setLiftArmSlideHomePos() {
@@ -173,13 +168,13 @@ public class BESA_Five_Spec_Auto extends OpMode {
 
     // Set the lift arm and slide to prescore specimen position
     public void setLiftArmSlidePreSpecScorePos() {
-        rotateLiftArm(475, CHAIN_ARM_POWER);
-        moveSlideArm(1250);
+        rotateLiftArm(555, CHAIN_ARM_POWER);
+        moveSlideArm(1000);
     }
 
     // Set the slide to push specimen onto rung position
     public void setSlideToPushSpecPos() {
-        moveSlideArm(1750);
+        moveSlideArm(1350);
     }
 
     // Set lift arm and slide for wall specimen pickup
@@ -219,18 +214,17 @@ public class BESA_Five_Spec_Auto extends OpMode {
     private Servo GripperOrientation;
     private CRServo GripperInOutTake;
 
+    public void initGripper() {
+        GripperRotation = hardwareMap.get(Servo.class, "GripperRotation");
+        GripperOrientation = hardwareMap.get(Servo.class, "GripperOrientation");
+        GripperInOutTake = hardwareMap.get(CRServo.class, "GripperInOutTake");
+    }
     // Timer
     ElapsedTime holdTimer;
     /**
      * Constructs the Gripper subsystem using the provided hardware map.
      * @param hardwareMap The hardware map from the op mode.
      */
-    public void Gripper(HardwareMap hardwareMap) {
-        // Map servos
-        GripperOrientation = hardwareMap.get(Servo.class, "GripperOrientation");
-        GripperRotation = hardwareMap.get(Servo.class, "GripperRotation");
-        GripperInOutTake = hardwareMap.get(CRServo.class, "GripperInOutTake");
-    }
 
     /**
      * Sets the Rotation servo to a specified position.
@@ -323,6 +317,10 @@ public class BESA_Five_Spec_Auto extends OpMode {
         GripperInOutTake.setPower(1);
     }
 
+    //stop spinning fingers
+    private void gripperStop() {
+        GripperInOutTake.setPower(0);
+    }
 //********************************* End Gripper **********************************************
 //
 //
@@ -333,10 +331,11 @@ public class BESA_Five_Spec_Auto extends OpMode {
     private TouchSensor ClimbHomeTouch;
     private TouchSensor ClimbExtendTouch;
 
-    public void VerticalLift(HardwareMap hardwareMap) {
+    public void initClimb() {
         ClimbVerticalLift = hardwareMap.get(CRServo.class, "ClimbVerticalLift");
         ClimbHomeTouch = hardwareMap.get(TouchSensor.class, "ClimbHomeTouch");
         ClimbExtendTouch = hardwareMap.get(TouchSensor.class, "ClimbExtendTouch");
+        ClimbVerticalLift.setDirection(DcMotorEx.Direction.REVERSE);
     }
 
     // Lower Climbing Lift function to ensure lift is in home position at start of autonomous
@@ -384,10 +383,9 @@ public class BESA_Five_Spec_Auto extends OpMode {
     private RevBlinkinLedDriver BlinkinLEDCtrl;
     private double colorGain = 1.05;
 
-    public void ColorBlink (HardwareMap hardwareMap) {
-        // Map color devices
-        BlinkinLEDCtrl = hardwareMap.get(RevBlinkinLedDriver.class, "BlinkinLEDCtrl");
+    public void initBlinkin() {
         GripperColorSensor = hardwareMap.get(ColorSensor.class, "GripperColorSensor");
+        BlinkinLEDCtrl = hardwareMap.get(RevBlinkinLedDriver.class, "BlinkinLEDCtrl");
     }
     public void blinkinStatic() {
         BlinkinLEDCtrl.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_RAINBOW_PALETTE);
@@ -439,76 +437,117 @@ public class BESA_Five_Spec_Auto extends OpMode {
 
     private Follower follower;
     private Path scorePreload;
-    private PathChain threeSamplePush;
-    private PathChain scoreOntoBar;
+    private PathChain threeSamplePush, scoreOntoBar;
     public int state = 0;
     //set poses
     private Pose startingPose = new Pose(8.5,66, Math.toRadians(0));
-    private Pose firstOnBar = new Pose(26,66,Math.toRadians(0));
-    private Pose secondOnBar = new Pose(26,68,Math.toRadians(0));
-    private Pose thirdOnBar = new Pose(26,70,Math.toRadians(0));
-    private Pose fourthOnBar = new Pose(26,72,Math.toRadians(0));
-    private Pose fifthOnBar = new Pose(26,74,Math.toRadians(0));
+    private Pose firstOnBar = new Pose(24,66,Math.toRadians(0));
+    private Pose secondOnBar = new Pose(24,68,Math.toRadians(0));
+    private Pose thirdOnBar = new Pose(24,70,Math.toRadians(0));
+    private Pose fourthOnBar = new Pose(24,72,Math.toRadians(0));
+    private Pose fifthOnBar = new Pose(24,74,Math.toRadians(0));
 
-    private Pose firstSampleLineup = new Pose(58,26,Math.toRadians(90));
-    private Pose secondSampleLineup = new Pose(58,16,Math.toRadians(90));
-    private Pose thirdSampleLineup = new Pose(58,8.5,Math.toRadians(90));
-    private Pose firstSampleback = new Pose(26,26,Math.toRadians(90));
-    private Pose secondSampleback = new Pose(26,16,Math.toRadians(90));
-    private Pose thirdSampleback = new Pose(26,8.5,Math.toRadians(90));
-    private Pose wallPickup = new Pose(24,24,Math.toRadians(180));
+    private Pose firstSampleLineup = new Pose(58,28,Math.toRadians(0));
+    private Pose secondSampleLineup = new Pose(58,20,Math.toRadians(0));
+    private Pose thirdSampleLineup = new Pose(58,13.5,Math.toRadians(0));
+    private Pose firstSampleback = new Pose(26,28,Math.toRadians(0));
+    private Pose secondSampleback = new Pose(26,20,Math.toRadians(0));
+    private Pose thirdSampleback = new Pose(26,13.5,Math.toRadians(0));
+    private Pose wallPickup = new Pose(24,28,Math.toRadians(180));
 
-
-    private void pathUpdate() {
-        switch (state) {
-            case 0:
-                follower.followPath(scorePreload);
-                state = 1;
-                break;
-            case 1:
-                if (!follower.isBusy()) {
-                    follower.followPath(threeSamplePush);
-                    state = 7;
-                    break;
-                }
-        }
-    }
-    @Override
-    public void init() {
-        setGripperHomePosition();
-        homeChainLiftArm();
-        Constants.setConstants(FConstants.class, LConstants.class);
-        follower = new Follower(hardwareMap);
-        follower.setStartingPose(startingPose);
-
+    private void buildPaths() {
         scorePreload = new Path(new BezierLine(new Point(startingPose),new Point(firstOnBar)));
         scorePreload.setConstantHeadingInterpolation(firstOnBar.getHeading());
 
         threeSamplePush = follower.pathBuilder()
-            //curve from first place to infront of first sample
-            .addPath(new BezierCurve(
-                 new Point(firstOnBar),
-                 new Point(28,20, Point.CARTESIAN),
-                 new Point(62,46, Point.CARTESIAN),
-                 new Point(firstSampleLineup))
-            //).setLinearHeadingInterpolation(firstOnBar.getHeading(),firstSampleLineup.getHeading())
-            ).setConstantHeadingInterpolation(firstOnBar.getHeading())
-            //push first sample
-            .addPath(new BezierLine(
-                  new Point(firstSampleLineup),
-                  new Point(firstSampleback))
-            ).setConstantHeadingInterpolation(firstOnBar.getHeading())
-            //move in front of second sample
-            .addPath(new BezierCurve(
-                  new Point(firstSampleback),
-                  new Point(51,26, Point.CARTESIAN),
-                  new Point(60,26, Point.CARTESIAN),
-                  new Point(secondSampleLineup))
-            ).setConstantHeadingInterpolation(firstOnBar.getHeading())
-            .setPathEndTimeoutConstraint(50)
-            .build();
+                //curve from first place to in front of first sample
+                .addPath(new BezierCurve(
+                                new Point(firstOnBar),
+                                new Point(28,20, Point.CARTESIAN),
+                                new Point(62,46, Point.CARTESIAN),
+                                new Point(firstSampleLineup))
+                        //).setLinearHeadingInterpolation(firstOnBar.getHeading(),firstSampleLineup.getHeading())
+                ).setConstantHeadingInterpolation(firstSampleLineup.getHeading())
+                //push first sample
+                .addPath(new BezierLine(
+                        new Point(firstSampleLineup),
+                        new Point(firstSampleback))
+                ).setConstantHeadingInterpolation(firstSampleback.getHeading())
+                //move in front of second sample
+                .addPath(new BezierCurve(
+                        new Point(firstSampleback),
+                        new Point(51,26, Point.CARTESIAN),
+                        new Point(60,26, Point.CARTESIAN),
+                        new Point(secondSampleLineup))
+                ).setConstantHeadingInterpolation(secondSampleLineup.getHeading())
+                // push second sample
+                .addPath(new BezierLine(
+                        new Point(secondSampleLineup),
+                        new Point(secondSampleback))
+                ).setConstantHeadingInterpolation(secondSampleback.getHeading())
+                // move in front of third sample
+                .addPath(new BezierCurve(
+                        new Point(secondSampleback),
+                        new Point(51,16, Point.CARTESIAN),
+                        new Point(60,16, Point.CARTESIAN),
+                        new Point(thirdSampleLineup))
+                ).setConstantHeadingInterpolation(thirdSampleLineup.getHeading())
+                // push third sample
+                .addPath(new BezierLine(
+                        new Point(thirdSampleLineup),
+                        new Point(thirdSampleback))
+                ).setConstantHeadingInterpolation(thirdSampleback.getHeading())
+                //move to first pickup
+                .addPath(new BezierLine(
+                        new Point(thirdSampleback),
+                        new Point(wallPickup))
+                ).setLinearHeadingInterpolation(thirdSampleback.getHeading(), wallPickup.getHeading())
+                .setPathEndTimeoutConstraint(50)
+                .build();
+    }
+    private void pathUpdate() {
+        switch (state) {
+            case 0:
+                setLiftArmSlidePreSpecScorePos(); // slide and arm
+                setRotationPosition(0.7);// gripper rotation
+                follower.followPath(scorePreload);
+                if (SlideMotor.getCurrentPosition() > 200) {
+                    setOrientationPosition(0.5);
+                    state = 1;
+                }
+                break;
+            case 1:
+                if (!follower.isBusy()) {
+                    gripperIntake();
+                    setSlideToPushSpecPos();
+                    state = 2;
+                }
+                break;
+            case 2:
+                if (SlideMotor.getCurrentPosition() > (SlideMotor.getTargetPosition()-50) && !follower.isBusy()) {
+                    gripperStop();
+                    setLiftArmSlideTravelPos();
+                    setGripperHomePosition();
+                    follower.followPath(threeSamplePush);
+                    state = 7;
+                }
+                break;
+        }
+    }
+    @Override
+    public void init() {
+        initLiftArmSlide(); // init arm
+        initGripper(); // init gripper
+        initClimb(); // init the climb motor
+        initBlinkin(); // init blinkin
+        setGripperHomePosition(); // set gripper position
+        homeChainLiftArm(); // home the slide and chain motor
+        lowerClimbingLift(); // home climbing lift
+        Constants.setConstants(FConstants.class, LConstants.class); // set pedro constants
 
-        follower.followPath(scorePreload);
+        follower = new Follower(hardwareMap); // create the follower
+        follower.setStartingPose(startingPose); // set the robots starting pose
+        buildPaths(); // build the paths
 
     }
     @Override

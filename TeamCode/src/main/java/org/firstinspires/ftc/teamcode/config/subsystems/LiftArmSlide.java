@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
- * The LiftArmSlide controls the chain lift arm and the slide extension.
+ * The initLiftArmSlide controls the chain lift arm and the slide extension.
  * It provides preset methods such as arm rotation or slide location.
  * In addition, the lift arm and slide home method is included here.
  */
@@ -90,8 +90,8 @@ public class LiftArmSlide {
             if (SlideHomeMagTouch.isPressed()) {
                 SlideMotor.setPower(0);
                 slidePos = 0;
-                telemetry.addData("Slide", "is retracted");
-                telemetry.update();
+                //telemetry.addData("Slide", "is retracted");
+                //telemetry.update();
                 break;
             }
             SlideMotor.setPower(-0.3);
@@ -106,8 +106,8 @@ public class LiftArmSlide {
             if (ChainLiftHomeTouch.isPressed()) {
                 ChainLiftMotor.setPower(0);
                 liftArmPos = 0;
-                telemetry.addData("Arm", "is retracted");
-                telemetry.update();
+                //telemetry.addData("Arm", "is retracted");
+                //telemetry.update();
                 break;
             }
             ChainLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -118,9 +118,9 @@ public class LiftArmSlide {
         ChainLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ChainLiftMotor.setPower(CHAIN_ARM_POWER);
         if (debug) {
-            telemetry.addData("current chain arm position", ChainLiftMotor.getCurrentPosition());
-            telemetry.addData("current slide position", SlideMotor.getCurrentPosition());
-            telemetry.update();
+            //telemetry.addData("current chain arm position", ChainLiftMotor.getCurrentPosition());
+            //telemetry.addData("current slide position", SlideMotor.getCurrentPosition());
+            //telemetry.update();
             //sleep(3000);
         }
     }
