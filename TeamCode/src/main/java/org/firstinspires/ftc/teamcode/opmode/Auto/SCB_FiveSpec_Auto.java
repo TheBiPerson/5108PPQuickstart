@@ -340,7 +340,7 @@ public class SCB_FiveSpec_Auto extends OpMode {
         follower.setStartingPose(startingPose);
         follower.setMaxPower(1);
 
-        liftArmSlide = new LiftArmSlide(hardwareMap, telemetry);
+        liftArmSlide = new LiftArmSlide(hardwareMap);
         gripper = new Gripper(hardwareMap);
 
         gripper.setGripperHomePosition();

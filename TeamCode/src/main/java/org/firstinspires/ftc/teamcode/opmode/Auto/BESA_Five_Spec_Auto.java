@@ -289,8 +289,10 @@ public class BESA_Five_Spec_Auto extends OpMode {
         GripperOrientation.setPosition(0.5);
     }
 
+
+
     // Sets the gripper for pushing specimen onto the bar
-    private void setPushSpecimemOnBar() {
+    private void setPushSpecimenOnBar() {
         GripperRotation.setPosition(0.7);
         GripperOrientation.setPosition(0.5);
     }

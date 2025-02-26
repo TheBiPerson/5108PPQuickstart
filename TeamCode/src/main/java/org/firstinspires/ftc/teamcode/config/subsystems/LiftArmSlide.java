@@ -1,16 +1,13 @@
 package org.firstinspires.ftc.teamcode.config.subsystems;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
- * The initLiftArmSlide controls the chain lift arm and the slide extension.
+ * The LiftArmSlide controls the chain lift arm and the slide extension.
  * It provides preset methods such as arm rotation or slide location.
  * In addition, the lift arm and slide home method is included here.
  */
@@ -23,19 +20,16 @@ public class LiftArmSlide {
 
     public double slideTarget = 0;
     public double liftArmTarget = 0;
-    public boolean slidesReached;
-    public boolean liftArmReached;
     // Between retracted and extended
     public boolean slidesRetracted;
     public int slidePos;
     public double maxSlide = 1300;
     public int liftArmPos;
-    private boolean debug = false;
 
-    public static double CHAIN_ARM_POWER = 0.5;
-    public static double SLIDE_POWER = 1.0;
+    public double CHAIN_ARM_POWER = 0.5;
+    public double SLIDE_POWER = 1.0;
 
-    public LiftArmSlide(HardwareMap hardwareMap, Telemetry telemetry) {
+    public LiftArmSlide(HardwareMap hardwareMap) {
 
         ChainLiftHomeTouch = hardwareMap.get(TouchSensor.class, "ChainLiftHomeTouch");
         SlideHomeMagTouch = hardwareMap.get(TouchSensor.class, "SlideHomeMagTouch");
@@ -64,7 +58,6 @@ public class LiftArmSlide {
         ChainLiftMotor.setTargetPosition(armTarget);
         ChainLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ChainLiftMotor.setPower(power);
-        //sleep(10);
     }
 
     /**
@@ -90,8 +83,6 @@ public class LiftArmSlide {
             if (SlideHomeMagTouch.isPressed()) {
                 SlideMotor.setPower(0);
                 slidePos = 0;
-                //telemetry.addData("Slide", "is retracted");
-                //telemetry.update();
                 break;
             }
             SlideMotor.setPower(-0.3);
@@ -106,8 +97,6 @@ public class LiftArmSlide {
             if (ChainLiftHomeTouch.isPressed()) {
                 ChainLiftMotor.setPower(0);
                 liftArmPos = 0;
-                //telemetry.addData("Arm", "is retracted");
-                //telemetry.update();
                 break;
             }
             ChainLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -117,12 +106,7 @@ public class LiftArmSlide {
         ChainLiftMotor.setTargetPosition(liftArmPos);
         ChainLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ChainLiftMotor.setPower(CHAIN_ARM_POWER);
-        if (debug) {
-            //telemetry.addData("current chain arm position", ChainLiftMotor.getCurrentPosition());
-            //telemetry.addData("current slide position", SlideMotor.getCurrentPosition());
-            //telemetry.update();
-            //sleep(3000);
-        }
+
     }
 
 
