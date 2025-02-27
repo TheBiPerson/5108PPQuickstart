@@ -657,6 +657,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
                     pathState = 12;
                 }
                 break;
+
             default:
                 if (!follower.isBusy()) {
                     requestOpModeStop();
