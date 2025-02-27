@@ -24,7 +24,7 @@ import com.pedropathing.util.Timer;
 @Autonomous(name = "SCB_FiveSpec_Auto", group = "auto")
 public class SCB_FiveSpec_Auto extends OpMode {
 
-    private ElapsedTime timer = new ElapsedTime();
+    private ElapsedTime Timer = new ElapsedTime();
     private Follower follower;
     private Timer pathTimer;
     private LiftArmSlide liftArmSlide;
@@ -34,6 +34,20 @@ public class SCB_FiveSpec_Auto extends OpMode {
     private PathChain preload, combinedPush, intake, score1, return1, score2, return2;
 //    private PathChain preload, combinedPush, intake, score1, return1, score2, return2, score3, return3, score4, return4, shift;
     private Pose startingPose =  new Pose   (8.5, 66, Math.toRadians(0));
+    private Pose firstOnBar = new Pose(24,66,Math.toRadians(0));
+    private Pose secondOnBar = new Pose(24,68,Math.toRadians(0));
+    private Pose thirdOnBar = new Pose(24,70,Math.toRadians(0));
+    private Pose fourthOnBar = new Pose(24,72,Math.toRadians(0));
+    private Pose fifthOnBar = new Pose(24,74,Math.toRadians(0));
+
+    private Pose firstSampleLineup = new Pose(58,28,Math.toRadians(0));
+    private Pose secondSampleLineup = new Pose(58,20,Math.toRadians(0));
+    private Pose thirdSampleLineup = new Pose(58,13.5,Math.toRadians(0));
+    private Pose firstSampleback = new Pose(26,28,Math.toRadians(0));
+    private Pose secondSampleback = new Pose(26,20,Math.toRadians(0));
+    private Pose thirdSampleback = new Pose(26,13.5,Math.toRadians(0));
+    private Pose wallPickup = new Pose(24,28,Math.toRadians(180));
+
 
     private double wall_intakeX = 18;
     private double subX = 39;
@@ -54,31 +68,37 @@ public class SCB_FiveSpec_Auto extends OpMode {
 
         // Path to push three samples to obs zone
         combinedPush = follower.pathBuilder()
+                //curve from first place to in front of first sample
                 .addPath(new BezierCurve(
                         new Point(new Pose(26.0, 66.0, Math.toRadians(90))),
                         new Point(new Pose(35.000, 53.000, Math.toRadians(90))),
                         new Point(new Pose(15.000, 37.000, Math.toRadians(90))),
                         new Point(new Pose(58, 30.000, Math.toRadians(90)))))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
+                //push first sample
                 .addPath(new BezierCurve(
                         new Point(new Pose(58, 30.000, Math.toRadians(0))),
                         new Point(new Pose(65.000, 20.000, Math.toRadians(0))),
                         new Point(new Pose(22, 20.000, Math.toRadians(0)))))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
+                //move in front of second sample
                 .addPath(new BezierCurve(
                         new Point(new Pose(22, 20.000, Math.toRadians(0))),
                         new Point(new Pose(65.000, 28, Math.toRadians(0))),
                         new Point(new Pose(58, 13.5, Math.toRadians(0)))))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
+                // push second sample
                 .addPath(new BezierLine(
                         new Point(new Pose(58, 13.5, Math.toRadians(0))),
                         new Point(new Pose(22, 13.5, Math.toRadians(0)))))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
+                // move in front of third sample
                 .addPath(new BezierCurve(
                         new Point(new Pose(22, 13.5, Math.toRadians(0))),
                         new Point(new Pose(65.000, 16.250, Math.toRadians(0))),
                         new Point(new Pose(58, 8.5, Math.toRadians(0)))))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
+                // push third sample
                 .addPath(new BezierLine(
                          new Point(58.000, 8.5, Point.CARTESIAN),
                          new Point(19, 7.5, Point.CARTESIAN)

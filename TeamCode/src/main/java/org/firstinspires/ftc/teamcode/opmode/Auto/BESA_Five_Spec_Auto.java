@@ -22,6 +22,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.pedropathing.util.Timer;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 
@@ -214,17 +215,15 @@ public class BESA_Five_Spec_Auto extends OpMode {
     private Servo GripperOrientation;
     private CRServo GripperInOutTake;
 
+    // Constructs the Gripper subsystem using the provided hardware map.
     public void initGripper() {
         GripperRotation = hardwareMap.get(Servo.class, "GripperRotation");
         GripperOrientation = hardwareMap.get(Servo.class, "GripperOrientation");
         GripperInOutTake = hardwareMap.get(CRServo.class, "GripperInOutTake");
     }
+
     // Timer
     ElapsedTime holdTimer;
-    /**
-     * Constructs the Gripper subsystem using the provided hardware map.
-     * @param hardwareMap The hardware map from the op mode.
-     */
 
     /**
      * Sets the Rotation servo to a specified position.
@@ -437,9 +436,11 @@ public class BESA_Five_Spec_Auto extends OpMode {
 //********************* Begin Pedro Pathing Pose and Chains **********************************
     // All associated Pedro variables, declarations, and methods.
 
+    private ElapsedTime timer = new ElapsedTime();
+    private Timer pathTimer;
     private Follower follower;
     private Path scorePreload;
-    private PathChain threeSamplePush, scoreOntoBar;
+    private PathChain preload,threeSamplePush, intake, score2, return2, score3, return3;
     public int state = 0;
     //set poses
     private Pose startingPose = new Pose(8.5,66, Math.toRadians(0));
@@ -449,7 +450,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
     private Pose fourthOnBar = new Pose(24,72,Math.toRadians(0));
     private Pose fifthOnBar = new Pose(24,74,Math.toRadians(0));
 
-    private Pose firstSampleLineup = new Pose(58,28,Math.toRadians(0));
+    private Pose firstSampleLineup = new Pose(58,31,Math.toRadians(0));
     private Pose secondSampleLineup = new Pose(58,20,Math.toRadians(0));
     private Pose thirdSampleLineup = new Pose(58,13.5,Math.toRadians(0));
     private Pose firstSampleback = new Pose(26,28,Math.toRadians(0));
@@ -457,22 +458,34 @@ public class BESA_Five_Spec_Auto extends OpMode {
     private Pose thirdSampleback = new Pose(26,13.5,Math.toRadians(0));
     private Pose wallPickup = new Pose(24,28,Math.toRadians(180));
 
+    private double wall_intakeX = 24;
+    private double subX = 24;
+
+
     private void buildPaths() {
+        /*
         scorePreload = new Path(new BezierLine(new Point(startingPose),new Point(firstOnBar)));
-        scorePreload.setConstantHeadingInterpolation(firstOnBar.getHeading());
+        scorePreload.setConstantHeadingInterpolation(firstOnBar.getHeading());*/
+        preload = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        new Point(startingPose),
+                        new Point(firstOnBar)))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
+                .build();
 
         threeSamplePush = follower.pathBuilder()
                 //curve from first place to in front of first sample
                 .addPath(new BezierCurve(
                                 new Point(firstOnBar),
-                                new Point(28,20, Point.CARTESIAN),
-                                new Point(62,46, Point.CARTESIAN),
+                                new Point(35,53, Point.CARTESIAN),
+                                new Point(15,37, Point.CARTESIAN),
                                 new Point(firstSampleLineup))
                         //).setLinearHeadingInterpolation(firstOnBar.getHeading(),firstSampleLineup.getHeading())
                 ).setConstantHeadingInterpolation(firstSampleLineup.getHeading())
                 //push first sample
-                .addPath(new BezierLine(
+                .addPath(new BezierCurve(
                         new Point(firstSampleLineup),
+                        new Point(new Pose(65.000, 20.000, Math.toRadians(90))),
                         new Point(firstSampleback))
                 ).setConstantHeadingInterpolation(firstSampleback.getHeading())
                 //move in front of second sample
@@ -483,15 +496,16 @@ public class BESA_Five_Spec_Auto extends OpMode {
                         new Point(secondSampleLineup))
                 ).setConstantHeadingInterpolation(secondSampleLineup.getHeading())
                 // push second sample
-                .addPath(new BezierLine(
+                .addPath(new BezierCurve(
                         new Point(secondSampleLineup),
+                        new Point(52,16, Point.CARTESIAN),
                         new Point(secondSampleback))
                 ).setConstantHeadingInterpolation(secondSampleback.getHeading())
                 // move in front of third sample
                 .addPath(new BezierCurve(
                         new Point(secondSampleback),
-                        new Point(51,16, Point.CARTESIAN),
-                        new Point(60,16, Point.CARTESIAN),
+                        new Point(50,21, Point.CARTESIAN),
+                        new Point(62,18.5, Point.CARTESIAN),
                         new Point(thirdSampleLineup))
                 ).setConstantHeadingInterpolation(thirdSampleLineup.getHeading())
                 // push third sample
@@ -499,40 +513,85 @@ public class BESA_Five_Spec_Auto extends OpMode {
                         new Point(thirdSampleLineup),
                         new Point(thirdSampleback))
                 ).setConstantHeadingInterpolation(thirdSampleback.getHeading())
+                .build();
+
+        intake = follower.pathBuilder()
                 //move to first pickup
                 .addPath(new BezierLine(
                         new Point(thirdSampleback),
                         new Point(wallPickup))
                 ).setLinearHeadingInterpolation(thirdSampleback.getHeading(), wallPickup.getHeading())
+                .build();
+
+        score2 = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        new Point(wallPickup),
+                        new Point(secondOnBar))
+                ).setLinearHeadingInterpolation(wallPickup.getHeading(), secondOnBar.getHeading())
+                .build();
+
+        return2 = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        new Point(secondOnBar),
+                        new Point(wallPickup))
+                ).setLinearHeadingInterpolation(secondOnBar.getHeading(), wallPickup.getHeading())
+                .build();
+
+        score3 = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        new Point(wallPickup),
+                        new Point(thirdOnBar))
+                ).setLinearHeadingInterpolation(wallPickup.getHeading(), thirdOnBar.getHeading())
+                .build();
+
+        return3 = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        new Point(thirdOnBar),
+                        new Point(wallPickup))
+                ).setLinearHeadingInterpolation(secondOnBar.getHeading(), wallPickup.getHeading())
                 .setPathEndTimeoutConstraint(50)
                 .build();
     }
     private void pathUpdate() {
         switch (state) {
-            case 0:
+            case 0: //start and move to first score position
                 setLiftArmSlidePreSpecScorePos(); // slide and arm
                 setRotationPosition(0.7);// gripper rotation
-                follower.followPath(scorePreload);
+                follower.followPath(preload);
                 if (SlideMotor.getCurrentPosition() > 200) {
                     setOrientationPosition(0.5);
                     state = 1;
                 }
                 break;
-            case 1:
+            case 1: // push specimen onto bar
                 if (!follower.isBusy()) {
                     gripperIntake();
                     setSlideToPushSpecPos();
                     state = 2;
                 }
                 break;
-            case 2:
+            case 2: //set travel position and push three samples to obs zone
                 if (SlideMotor.getCurrentPosition() > (SlideMotor.getTargetPosition()-50) && !follower.isBusy()) {
                     gripperStop();
                     moveSlideArm(200);
                     setLiftArmSlideTravelPos();
                     setGripperHomePosition();
                     follower.followPath(threeSamplePush);
-                    state = 7;
+                    state = 3;
+                }
+                break;
+            case 3: // Travel to wall intake position
+                if(!follower.isBusy()) {
+                    //liftArmSlide.setLiftArmSlideTravelPos();
+                    follower.followPath(intake,0.6, true);
+                    state = 4;
+                }
+                break;
+            case 4: // Specimen wall intake
+                if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 1.2) {
+                    //gripper.gripperOuttake();
+                    //liftArmSlide.moveSlideArm(50);
+                    state = 5;
                 }
                 break;
         }
