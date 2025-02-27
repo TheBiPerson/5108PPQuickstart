@@ -441,7 +441,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
     private Follower follower;
     private Path scorePreload;
     private PathChain preload,threeSamplePush, intake, score2, return2, score3, return3;
-    public int state = 0;
+    public int pathState = 0;
     //set poses
     private Pose startingPose = new Pose(8.5,66, Math.toRadians(0));
     private Pose firstOnBar = new Pose(24,66,Math.toRadians(0));
@@ -553,21 +553,21 @@ public class BESA_Five_Spec_Auto extends OpMode {
                 .build();
     }
     private void pathUpdate() {
-        switch (state) {
+        switch (pathState) {
             case 0: //start and move to first score position
                 setLiftArmSlidePreSpecScorePos(); // slide and arm
                 setRotationPosition(0.7);// gripper rotation
                 follower.followPath(preload);
                 if (SlideMotor.getCurrentPosition() > 200) {
                     setOrientationPosition(0.5);
-                    state = 1;
+                    pathState = 1;
                 }
                 break;
             case 1: // push specimen onto bar
                 if (!follower.isBusy()) {
                     gripperIntake();
                     setSlideToPushSpecPos();
-                    state = 2;
+                    pathState = 2;
                 }
                 break;
             case 2: //set travel position and push three samples to obs zone
@@ -577,21 +577,21 @@ public class BESA_Five_Spec_Auto extends OpMode {
                     setLiftArmSlideTravelPos();
                     setGripperHomePosition();
                     follower.followPath(threeSamplePush);
-                    state = 3;
+                    pathState = 3;
                 }
                 break;
             case 3: // Travel to wall intake position
                 if(!follower.isBusy()) {
                     //liftArmSlide.setLiftArmSlideTravelPos();
                     follower.followPath(intake,0.6, true);
-                    state = 4;
+                    pathState = 4;
                 }
                 break;
             case 4: // Specimen wall intake
                 if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 1.2) {
                     //gripper.gripperOuttake();
                     //liftArmSlide.moveSlideArm(50);
-                    state = 5;
+                    pathState = 5;
                 }
                 break;
         }
