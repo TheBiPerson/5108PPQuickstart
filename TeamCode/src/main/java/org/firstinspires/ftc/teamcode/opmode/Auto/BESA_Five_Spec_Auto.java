@@ -69,9 +69,9 @@ public class BESA_Five_Spec_Auto extends OpMode {
 
         // PIDF control is essential to stop motor oscillation
         ChainLiftMotor.setVelocityPIDFCoefficients(1.26, 0.126, 0, 12.6);
-        ChainLiftMotor.setPositionPIDFCoefficients(10);
+        ChainLiftMotor.setPositionPIDFCoefficients(13.5);
         SlideMotor.setVelocityPIDFCoefficients(1.26, 0.126, 0, 12.6);
-        SlideMotor.setPositionPIDFCoefficients(10);
+        SlideMotor.setPositionPIDFCoefficients(13.5);
     }
 
     // Move the ChainLiftArm to a target position.
@@ -528,6 +528,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
             case 2:
                 if (SlideMotor.getCurrentPosition() > (SlideMotor.getTargetPosition()-50) && !follower.isBusy()) {
                     gripperStop();
+                    moveSlideArm(200);
                     setLiftArmSlideTravelPos();
                     setGripperHomePosition();
                     follower.followPath(threeSamplePush);
