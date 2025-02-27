@@ -283,7 +283,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
     }
 
     // Sets the gripper for pre specimen placement
-    private void setPreSpecimenPlacement() {
+    private void setGripperPreSpecimenPlacement() {
         GripperRotation.setPosition(0.7);
         GripperOrientation.setPosition(0.5);
     }
@@ -291,19 +291,19 @@ public class BESA_Five_Spec_Auto extends OpMode {
 
 
     // Sets the gripper for pushing specimen onto the bar
-    private void setPushSpecimenOnBar() {
+    private void setGripperPushSpecimenOnBar() {
         GripperRotation.setPosition(0.7);
         GripperOrientation.setPosition(0.5);
     }
 
     // Sets the gripper for wall specimen pickup
-    private void setWallIntakePosition() {
+    private void setGripperWallIntakePosition() {
         GripperRotation.setPosition(0.39);
         GripperOrientation.setPosition(0.5);
     }
 
     // Sets the gripper for wall specimen removal
-    private void setWallSpecRemovalPosition() {
+    private void setGripperWallSpecRemovalPosition() {
         GripperRotation.setPosition(0.5);
         GripperOrientation.setPosition(0.5);
     }
@@ -571,9 +571,9 @@ public class BESA_Five_Spec_Auto extends OpMode {
                 }
                 break;
             case 2: //set travel position and push three samples to obs zone
-                if (SlideMotor.getCurrentPosition() > (SlideMotor.getTargetPosition()-50) && !follower.isBusy()) {
-                    gripperStop();
-                    moveSlideArm(200);
+                gripperStop();
+                moveSlideArm(200);
+                if (SlideMotor.getCurrentPosition() < (SlideMotor.getTargetPosition() + 50) && !follower.isBusy()) {
                     setLiftArmSlideTravelPos();
                     setGripperHomePosition();
                     follower.followPath(threeSamplePush);
@@ -582,18 +582,88 @@ public class BESA_Five_Spec_Auto extends OpMode {
                 break;
             case 3: // Travel to wall intake position
                 if(!follower.isBusy()) {
-                    //liftArmSlide.setLiftArmSlideTravelPos();
+                    setLiftArmSlidePreWallPickup();
                     follower.followPath(intake,0.6, true);
                     pathState = 4;
                 }
                 break;
-            case 4: // Specimen wall intake
-                if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 1.2) {
-                    //gripper.gripperOuttake();
-                    //liftArmSlide.moveSlideArm(50);
+            case 4: // Specimen wall intake 2nd specimen
+                pathTimer.resetTimer();
+                gripperIntake();
+                setSlideForWallPickup();
+                setGripperWallIntakePosition();
+                if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 0.75) {
+                    setRemoveWallSpecimen();
                     pathState = 5;
                 }
                 break;
+            case 5: // Move to score 2nd specimen
+                follower.followPath(score2);
+                if (follower.getPose().getY() > 55 && follower.isBusy()) {
+                    setLiftArmSlidePreSpecScorePos();
+                    setGripperPreSpecimenPlacement();
+                    pathState = 6;
+                }
+                break;
+            case 6: // push 2nd specimen onto bar
+                if (!follower.isBusy()) {
+                    setGripperPushSpecimenOnBar();
+                    gripperIntake();
+                    setSlideToPushSpecPos();
+                    pathState = 7;
+                }
+                break;
+            case 7: // set wall intake position and go get 3rd specimen
+                gripperStop();
+                moveSlideArm(200);
+                if (SlideMotor.getCurrentPosition() < (SlideMotor.getTargetPosition() + 50) && !follower.isBusy()) {
+                    setLiftArmSlideTravelPos();
+                    setLiftArmSlidePreWallPickup();
+                    follower.followPath(return2);
+                    pathState = 8;
+                }
+                break;
+            case 8: // Specimen wall intake 3rd specimen
+                pathTimer.resetTimer();
+                gripperIntake();
+                setSlideForWallPickup();
+                setGripperWallIntakePosition();
+                if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 0.75) {
+                    setRemoveWallSpecimen();
+                    pathState = 9;
+                }
+                break;
+            case 9: // Move to score 3rd specimen
+                follower.followPath(score3);
+                if (follower.getPose().getY() > 57 && follower.isBusy()) {
+                    setLiftArmSlidePreSpecScorePos();
+                    pathState = 10;
+                }
+                break;
+            case 10: // push 3rd specimen onto bar
+                if (!follower.isBusy()) {
+                    gripperIntake();
+                    setSlideToPushSpecPos();
+                    pathState = 11;
+                }
+                break;
+            case 11: // set wall intake position and go get 4th specimen
+                gripperStop();
+                moveSlideArm(200);
+                if (SlideMotor.getCurrentPosition() < (SlideMotor.getTargetPosition() + 50) && !follower.isBusy()) {
+                    setLiftArmSlideTravelPos();
+                    setLiftArmSlidePreWallPickup();
+                    follower.followPath(return3);
+                    pathState = 12;
+                }
+                break;
+            default:
+                if (!follower.isBusy()) {
+                    requestOpModeStop();
+                }
+
+
+
         }
     }
     @Override
