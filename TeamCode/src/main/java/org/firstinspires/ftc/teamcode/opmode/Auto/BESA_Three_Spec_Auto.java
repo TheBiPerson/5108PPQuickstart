@@ -29,8 +29,8 @@ import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
-@Autonomous(name = "BESA_Five_Spec_Auto", group = "auto")
-public class BESA_Five_Spec_Auto extends OpMode {
+@Autonomous(name = "BESA_Three_Spec_Auto", group = "auto")
+public class BESA_Three_Spec_Auto extends OpMode {
 
 //*************************** Begin LiftArm and Slide ****************************************
     /**
@@ -438,13 +438,10 @@ public class BESA_Five_Spec_Auto extends OpMode {
     // All associated Pedro variables, declarations, and methods.
 
     private ElapsedTime timer = new ElapsedTime();
-    private Timer pathTimer; // timers set are unused, and paths have timers built in for auto moving on, see .setPathEndTimeoutConstraint(int)
     private Follower follower;
-    private Path scorePreload;
-    private PathChain preload,threeSamplePush, /*intake,*/ score2, return2, score3, return3; // clearer name inline with poses
-    //intake is unnecessary as it can be the end of pathchain threeSamplePush with no consequences
-    public int pathState = 0;
-    //set poses
+    private PathChain preload,threeSamplePush, score2, return2, score3, park; // clearer name inline with poses
+    public int pathState = 0; //used for updating current path
+    // set poses
     private Pose startingPose = new Pose(8.5,66, Math.toRadians(0));
 
     private Pose firstOnBar = new Pose(25,66,Math.toRadians(0));
@@ -567,14 +564,13 @@ public class BESA_Five_Spec_Auto extends OpMode {
                 .addParametricCallback(0.7, () ->setLiftArmSlidePreSpecScorePos())
                 .build();
 
-        return3 = follower.pathBuilder()
+        park = follower.pathBuilder()
                 .addPath(new BezierLine(
                         new Point(thirdOnBar),
                         new Point(wallPickup3))
-                ).setConstantHeadingInterpolation(thirdOnBar.getHeading())
-                .addParametricCallback(0.7, () ->setLiftArmSlidePreWallPickup())
-                .addParametricCallback(0.8, () -> setWallSpecRemovalPosition())
-                .setPathEndTimeoutConstraint(50)
+                ).setConstantHeadingInterpolation(Math.toRadians(135))
+                .addParametricCallback(0.3, () ->moveSlideArm(1000))
+                .addParametricCallback(0.3, () ->rotateLiftArm(100, CHAIN_ARM_POWER))
                 .build();
     }
     private void pathUpdate() {
@@ -614,30 +610,31 @@ public class BESA_Five_Spec_Auto extends OpMode {
                     pathState = 4;
                 }
                 break;
-            case 4:
+                //begin second sample
+            case 4: // set timer for state 5
                 if (!follower.isBusy()) {
                     timer.reset();
                     pathState = 5;
                 }
                 break;
-            case 5: // grab from wall
+            case 5: // grab sample
                 if (ChainLiftMotor.getCurrentPosition() < ChainLiftMotor.getTargetPosition()+5 && ChainLiftMotor.getCurrentPosition() > ChainLiftMotor.getTargetPosition()-3 && timer.milliseconds() > 700) {
                     gripperIntake();
                     setSlideForWallPickup();
                     pathState = 6;
                 }
                 break;
-            case 6:
+            case 6: // pick specimen off wall
                 if (SlideMotor.getCurrentPosition() > SlideMotor.getTargetPosition() - 10) {
                     rotateLiftArm(500, CHAIN_ARM_POWER);
                     pathState = 7;
                 }
                 break;
-            case 7:
+            case 7: // move to bar
                 follower.followPath(score2, true);
                 pathState = 8;
                 break;
-            case 8:
+            case 8: // push onto bar
                 if (!follower.isBusy()) {
                     if(ChainLiftMotor.getCurrentPosition() < ChainLiftMotor.getTargetPosition()+3 &&ChainLiftMotor.getCurrentPosition() > ChainLiftMotor.getTargetPosition()-3) {
                         gripperIntake();
@@ -647,7 +644,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
                     }
                 }
                 break;
-            case 9:
+            case 9: // retract arm
                 if (SlideMotor.getCurrentPosition() > (SlideMotor.getTargetPosition()-20) && !follower.isBusy()) {
                     setWallSpecRemovalPosition();
                     gripperStop();
@@ -655,37 +652,38 @@ public class BESA_Five_Spec_Auto extends OpMode {
                     pathState = 10;
                 }
                 break;
-            case 10:
+            case 10: // move to wall
                 if (SlideMotor.getCurrentPosition() < SlideMotor.getTargetPosition() + 15 && SlideMotor.getCurrentPosition() > SlideMotor.getTargetPosition() - 15 ) {
                     setLiftArmSlideTravelPos();
                     follower.followPath(return2, true);
                     pathState = 11;
                 }
                 break;
-            case 11:
+                // begin third sample
+            case 11: // set timer for state 12
                 if (!follower.isBusy()) {
                     timer.reset();
                     pathState = 12;
                 }
                 break;
-            case 12:
+            case 12: // grab sample
                 if (ChainLiftMotor.getCurrentPosition() < ChainLiftMotor.getTargetPosition()+5 && ChainLiftMotor.getCurrentPosition() > ChainLiftMotor.getTargetPosition()-3 && timer.milliseconds() > 800) {
                     gripperIntake();
                     setSlideForWallPickup();
                     pathState = 13;
                 }
                 break;
-            case 13:
+            case 13: // pickup off wall
                 if (SlideMotor.getCurrentPosition() > SlideMotor.getTargetPosition() - 10) {
                     rotateLiftArm(500, CHAIN_ARM_POWER);
                     pathState = 14;
                 }
                 break;
-            case 14:
+            case 14: // move to bar
                 follower.followPath(score3, true);
                 pathState = 15;
                 break;
-            case 15:
+            case 15: // push onto bar
                 if (!follower.isBusy()) {
                     if(ChainLiftMotor.getCurrentPosition() < ChainLiftMotor.getTargetPosition()+3 &&ChainLiftMotor.getCurrentPosition() > ChainLiftMotor.getTargetPosition()-3) {
                         gripperIntake();
@@ -695,7 +693,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
                     }
                 }
                 break;
-            case 16:
+            case 16: // retract arm
                 if (SlideMotor.getCurrentPosition() > (SlideMotor.getTargetPosition()-20) && !follower.isBusy()) {
                     setWallSpecRemovalPosition();
                     gripperStop();
@@ -703,29 +701,13 @@ public class BESA_Five_Spec_Auto extends OpMode {
                     pathState = 17;
                 }
                 break;
-            case 17:
+            case 17: // park
                 if (SlideMotor.getCurrentPosition() < SlideMotor.getTargetPosition() + 15 && SlideMotor.getCurrentPosition() > SlideMotor.getTargetPosition() - 15 ) {
                     setLiftArmSlideTravelPos();
-                    follower.followPath(return3, true);
-                    pathState = 18;
+                    follower.followPath(park, true);
+                    pathState = 400;
                 }
                 break;
-            case 18:
-
-                break;
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         }
     }
