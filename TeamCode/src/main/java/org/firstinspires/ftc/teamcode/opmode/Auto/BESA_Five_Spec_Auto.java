@@ -70,7 +70,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
 
         // PIDF control is essential to stop motor oscillation
         //ChainLiftMotor.setVelocityPIDFCoefficients(1.26, 0.126, 0, 12.6);
-        ChainLiftMotor.setPositionPIDFCoefficients(13.5);
+        ChainLiftMotor.setPositionPIDFCoefficients(11.5);
         //SlideMotor.setVelocityPIDFCoefficients(1.26, 0.126, 0, 12.6);
         SlideMotor.setPositionPIDFCoefficients(13.5);
     }
@@ -169,24 +169,25 @@ public class BESA_Five_Spec_Auto extends OpMode {
 
     // Set the lift arm and slide to prescore specimen position
     public void setLiftArmSlidePreSpecScorePos() {
-        rotateLiftArm(530, CHAIN_ARM_POWER);
+        rotateLiftArm(525, CHAIN_ARM_POWER);
         moveSlideArm(1000);
     }
 
     // Set the slide to push specimen onto rung position
     public void setSlideToPushSpecPos() {
-        moveSlideArm(1575);
+        rotateLiftArm(520, CHAIN_ARM_POWER);
+        moveSlideArm(1500);
     }
 
     // Set lift arm and slide for wall specimen pickup
     public void setLiftArmSlidePreWallPickup() {
         rotateLiftArm(280, CHAIN_ARM_POWER);
-        moveSlideArm(600);
+        moveSlideArm(450);
     }
 
     // Set the slide to grab specimen from wall
     public void setSlideForWallPickup() {
-        moveSlideArm(1175);
+        moveSlideArm(1200);
     }
 
     // Set lift arm and slide after grabbing specimen from wall
@@ -284,7 +285,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
 
     // Sets the gripper for pre specimen placement
     private void setPreSpecimenPlacement() {
-        GripperRotation.setPosition(0.7);
+        GripperRotation.setPosition(0.68);
         GripperOrientation.setPosition(0.5);
     }
 
@@ -304,7 +305,7 @@ public class BESA_Five_Spec_Auto extends OpMode {
 
     // Sets the gripper for wall specimen removal
     private void setWallSpecRemovalPosition() {
-        GripperRotation.setPosition(0.5);
+        GripperRotation.setPosition(0.48);
         GripperOrientation.setPosition(0.5);
     }
 
@@ -446,21 +447,22 @@ public class BESA_Five_Spec_Auto extends OpMode {
     //set poses
     private Pose startingPose = new Pose(8.5,66, Math.toRadians(0));
 
-    private Pose firstOnBar = new Pose(24,66,Math.toRadians(0));
-    private Pose secondOnBar = new Pose(26,68,Math.toRadians(0));
-    private Pose thirdOnBar = new Pose(27,70,Math.toRadians(0));
+    private Pose firstOnBar = new Pose(25,66,Math.toRadians(0));
+    private Pose secondOnBar = new Pose(29.5,68,Math.toRadians(0));
+    private Pose thirdOnBar = new Pose(28.5,68,Math.toRadians(0));
     private Pose fourthOnBar = new Pose(28,72,Math.toRadians(0));
     private Pose fifthOnBar = new Pose(28,74,Math.toRadians(0));
 
-    private Pose wallPickup1 = new Pose(23,32,Math.toRadians(180));
-    private Pose wallPickup2 = new Pose(22,42,Math.toRadians(180));
-    private Pose wallPickup3 = new Pose(20,40,Math.toRadians(180));
+    private Pose wallPickup1 = new Pose(23,28,Math.toRadians(180));
+    private Pose wallPickup2 = new Pose(22,38,Math.toRadians(180));
+    private Pose wallPickup3 = new Pose(22,38,Math.toRadians(180));
     private Pose wallPickup4 = new Pose(24,28,Math.toRadians(180));
     private Pose wallPickup5 = new Pose(24,28,Math.toRadians(180));
 
     private Pose firstSampleLineup = new Pose(58,28,Math.toRadians(10));
     private Pose secondSampleLineup = new Pose(58,20,Math.toRadians(10));
     private Pose thirdSampleLineup = new Pose(58,13.5,Math.toRadians(10));
+
     private Pose firstSampleBack = new Pose(28,28,Math.toRadians(0));
     private Pose secondSampleBack = new Pose(28,20,Math.toRadians(0));
     private Pose thirdSampleBack = new Pose(28,13.5,Math.toRadians(0));
@@ -538,18 +540,18 @@ public class BESA_Five_Spec_Auto extends OpMode {
                 .addPath(new BezierLine(
                         new Point(wallPickup1),
                         new Point(secondOnBar))
-                ).setLinearHeadingInterpolation(wallPickup1.getHeading(), -secondOnBar.getHeading())
-                .addParametricCallback(0.2, () -> moveSlideArm(500))
+                ).setConstantHeadingInterpolation(secondOnBar.getHeading())
+                .addParametricCallback(0.05, () -> moveSlideArm(500))
                 .addParametricCallback(0.3, () -> gripperStop())
-                .addParametricCallback(0.8, () ->setLiftArmSlidePreSpecScorePos())
-                .addParametricCallback(0.9, () -> setPreSpecimenPlacement())
+                .addParametricCallback(0.6, () -> setPreSpecimenPlacement())
+                .addParametricCallback(0.7, () ->setLiftArmSlidePreSpecScorePos())
                 .build();
 
         return2 = follower.pathBuilder()
                 .addPath(new BezierLine(
                         new Point(secondOnBar),
                         new Point(wallPickup2))
-                ).setLinearHeadingInterpolation(secondOnBar.getHeading(), wallPickup2.getHeading())
+                ).setConstantHeadingInterpolation(wallPickup2.getHeading())
                 .addParametricCallback(0.7, () ->setLiftArmSlidePreWallPickup())
                 .addParametricCallback(0.8, () -> setWallSpecRemovalPosition())
                 .build();
@@ -558,18 +560,18 @@ public class BESA_Five_Spec_Auto extends OpMode {
                 .addPath(new BezierLine(
                         new Point(wallPickup2),
                         new Point(thirdOnBar))
-                ).setLinearHeadingInterpolation(wallPickup2.getHeading(), -thirdOnBar.getHeading())
-                .addParametricCallback(0.2, () -> moveSlideArm(500))
+                ).setConstantHeadingInterpolation(thirdOnBar.getHeading())
+                .addParametricCallback(0.05, () -> moveSlideArm(500))
                 .addParametricCallback(0.3, () -> gripperStop())
-                .addParametricCallback(0.8, () ->setLiftArmSlidePreSpecScorePos())
-                .addParametricCallback(0.9, () -> setPreSpecimenPlacement())
+                .addParametricCallback(0.6, () -> setPreSpecimenPlacement())
+                .addParametricCallback(0.7, () ->setLiftArmSlidePreSpecScorePos())
                 .build();
 
         return3 = follower.pathBuilder()
                 .addPath(new BezierLine(
                         new Point(thirdOnBar),
                         new Point(wallPickup3))
-                ).setLinearHeadingInterpolation(thirdOnBar.getHeading(), wallPickup3.getHeading())
+                ).setConstantHeadingInterpolation(thirdOnBar.getHeading())
                 .addParametricCallback(0.7, () ->setLiftArmSlidePreWallPickup())
                 .addParametricCallback(0.8, () -> setWallSpecRemovalPosition())
                 .setPathEndTimeoutConstraint(50)
@@ -588,8 +590,9 @@ public class BESA_Five_Spec_Auto extends OpMode {
                 break;
             case 1: // push specimen onto bar
                 if (!follower.isBusy()) {
-                    if (ChainLiftMotor.getCurrentPosition() < ChainLiftMotor.getTargetPosition()+5 && ChainLiftMotor.getCurrentPosition() > ChainLiftMotor.getTargetPosition()-5) {
+                    if (ChainLiftMotor.getCurrentPosition() < ChainLiftMotor.getTargetPosition()+3 && ChainLiftMotor.getCurrentPosition() > ChainLiftMotor.getTargetPosition()-3) {
                         gripperIntake();
+                        setRotationPosition(0.6);
                         setSlideToPushSpecPos();
                         pathState = 2;
                     }
@@ -600,12 +603,11 @@ public class BESA_Five_Spec_Auto extends OpMode {
                 if (SlideMotor.getCurrentPosition() > (SlideMotor.getTargetPosition()-20) && !follower.isBusy()) {
                     gripperStop();
                     moveSlideArm(400);
-
                     pathState = 3;
                 }
                 break;
             case 3: // travel state and move three samples back
-                if (SlideMotor.getCurrentPosition() < SlideMotor.getTargetPosition() + 15 && SlideMotor.getCurrentPosition() > SlideMotor.getTargetPosition() - 15 ) {
+                if (SlideMotor.getCurrentPosition() < SlideMotor.getTargetPosition() + 15 && SlideMotor.getCurrentPosition() > SlideMotor.getTargetPosition() - 15) {
                     setOrientationPosition(0);
                     setLiftArmSlideTravelPos();
                     follower.followPath(threeSamplePush, true);
@@ -614,89 +616,101 @@ public class BESA_Five_Spec_Auto extends OpMode {
                 break;
             case 4:
                 if (!follower.isBusy()) {
-                    if (ChainLiftMotor.getCurrentPosition() < ChainLiftMotor.getTargetPosition()+5 && ChainLiftMotor.getCurrentPosition() > ChainLiftMotor.getTargetPosition()-5) {
-                        gripperIntake();
-                        setSlideForWallPickup();
-                        pathState = 5;
-                    }
+                    timer.reset();
+                    pathState = 5;
                 }
                 break;
-            case 5:
-                if (SlideMotor.getCurrentPosition() > SlideMotor.getTargetPosition() - 10) {
-                    rotateLiftArm(500, CHAIN_ARM_POWER);
+            case 5: // grab from wall
+                if (ChainLiftMotor.getCurrentPosition() < ChainLiftMotor.getTargetPosition()+5 && ChainLiftMotor.getCurrentPosition() > ChainLiftMotor.getTargetPosition()-3 && timer.milliseconds() > 700) {
+                    gripperIntake();
+                    setSlideForWallPickup();
                     pathState = 6;
                 }
                 break;
             case 6:
-                follower.followPath(score2, true);
-                pathState = 7;
+                if (SlideMotor.getCurrentPosition() > SlideMotor.getTargetPosition() - 10) {
+                    rotateLiftArm(500, CHAIN_ARM_POWER);
+                    pathState = 7;
+                }
                 break;
             case 7:
+                follower.followPath(score2, true);
+                pathState = 8;
+                break;
+            case 8:
                 if (!follower.isBusy()) {
-                    if(ChainLiftMotor.getCurrentPosition() < ChainLiftMotor.getTargetPosition()+5 &&ChainLiftMotor.getCurrentPosition() > ChainLiftMotor.getTargetPosition()-5) {
+                    if(ChainLiftMotor.getCurrentPosition() < ChainLiftMotor.getTargetPosition()+3 &&ChainLiftMotor.getCurrentPosition() > ChainLiftMotor.getTargetPosition()-3) {
                         gripperIntake();
+                        setRotationPosition(0.6);
                         setSlideToPushSpecPos();
-                        pathState = 8;
+                        pathState = 9;
                     }
                 }
                 break;
-            case 8:
+            case 9:
                 if (SlideMotor.getCurrentPosition() > (SlideMotor.getTargetPosition()-20) && !follower.isBusy()) {
+                    setWallSpecRemovalPosition();
                     gripperStop();
                     moveSlideArm(400);
-                    pathState = 9;
-                }
-                break;
-            case 9:
-                if (SlideMotor.getCurrentPosition() < SlideMotor.getTargetPosition() + 15 && SlideMotor.getCurrentPosition() > SlideMotor.getTargetPosition() - 15 ) {
-                    setLiftArmSlideTravelPos();
-                    follower.followPath(return2, true);
                     pathState = 10;
                 }
                 break;
             case 10:
-                if (!follower.isBusy()) {
-                    if (ChainLiftMotor.getCurrentPosition() < ChainLiftMotor.getTargetPosition()+5 && ChainLiftMotor.getCurrentPosition() > ChainLiftMotor.getTargetPosition()-5) {
-                        gripperIntake();
-                        setSlideForWallPickup();
-                        pathState = 11;
-                    }
+                if (SlideMotor.getCurrentPosition() < SlideMotor.getTargetPosition() + 15 && SlideMotor.getCurrentPosition() > SlideMotor.getTargetPosition() - 15 ) {
+                    setLiftArmSlideTravelPos();
+                    follower.followPath(return2, true);
+                    pathState = 11;
                 }
                 break;
             case 11:
-                if (SlideMotor.getCurrentPosition() > SlideMotor.getTargetPosition() - 10) {
-                    rotateLiftArm(500, CHAIN_ARM_POWER);
+                if (!follower.isBusy()) {
+                    timer.reset();
                     pathState = 12;
                 }
                 break;
             case 12:
-                follower.followPath(score3, true);
-                pathState = 13;
+                if (ChainLiftMotor.getCurrentPosition() < ChainLiftMotor.getTargetPosition()+5 && ChainLiftMotor.getCurrentPosition() > ChainLiftMotor.getTargetPosition()-3 && timer.milliseconds() > 800) {
+                    gripperIntake();
+                    setSlideForWallPickup();
+                    pathState = 13;
+                }
                 break;
             case 13:
-                if (!follower.isBusy()) {
-                    if(ChainLiftMotor.getCurrentPosition() < ChainLiftMotor.getTargetPosition()+5 &&ChainLiftMotor.getCurrentPosition() > ChainLiftMotor.getTargetPosition()-5) {
-                        gripperIntake();
-                        setSlideToPushSpecPos();
-                        pathState = 14;
-                    }
+                if (SlideMotor.getCurrentPosition() > SlideMotor.getTargetPosition() - 10) {
+                    rotateLiftArm(500, CHAIN_ARM_POWER);
+                    pathState = 14;
                 }
                 break;
             case 14:
-                if (SlideMotor.getCurrentPosition() > (SlideMotor.getTargetPosition()-20) && !follower.isBusy()) {
-                    gripperStop();
-                    moveSlideArm(400);
-                    pathState = 15;
-                }
+                follower.followPath(score3, true);
+                pathState = 15;
                 break;
             case 15:
-                if (SlideMotor.getCurrentPosition() < SlideMotor.getTargetPosition() + 15 && SlideMotor.getCurrentPosition() > SlideMotor.getTargetPosition() - 15 ) {
-                    setLiftArmSlideTravelPos();
-                    follower.followPath(return3, true);
-                    pathState = 16;
+                if (!follower.isBusy()) {
+                    if(ChainLiftMotor.getCurrentPosition() < ChainLiftMotor.getTargetPosition()+3 &&ChainLiftMotor.getCurrentPosition() > ChainLiftMotor.getTargetPosition()-3) {
+                        gripperIntake();
+                        setRotationPosition(0.6);
+                        setSlideToPushSpecPos();
+                        pathState = 16;
+                    }
                 }
                 break;
             case 16:
+                if (SlideMotor.getCurrentPosition() > (SlideMotor.getTargetPosition()-20) && !follower.isBusy()) {
+                    setWallSpecRemovalPosition();
+                    gripperStop();
+                    moveSlideArm(400);
+                    pathState = 17;
+                }
+                break;
+            case 17:
+                if (SlideMotor.getCurrentPosition() < SlideMotor.getTargetPosition() + 15 && SlideMotor.getCurrentPosition() > SlideMotor.getTargetPosition() - 15 ) {
+                    setLiftArmSlideTravelPos();
+                    follower.followPath(return3, true);
+                    pathState = 18;
+                }
+                break;
+            case 18:
 
                 break;
 

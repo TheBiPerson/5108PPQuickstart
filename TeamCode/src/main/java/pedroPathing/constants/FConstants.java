@@ -35,16 +35,16 @@ public class FConstants {
         FollowerConstants.useSecondaryTranslationalPID = false;
         FollowerConstants.secondaryTranslationalPIDFCoefficients.setCoefficients(0.1,0,0.01,0); // Not being used, @see useSecondaryTranslationalPID
 
-        FollowerConstants.headingPIDFCoefficients.setCoefficients(3,0,0.1,0);
+        FollowerConstants.headingPIDFCoefficients.setCoefficients(3,0,0.15,0);
         FollowerConstants.useSecondaryHeadingPID = false;
         FollowerConstants.secondaryHeadingPIDFCoefficients.setCoefficients(2,0,0.1,0); // Not being used, @see useSecondaryHeadingPID
 
         // BESA constants
         //FollowerConstants.drivePIDFCoefficients.setCoefficients(0.018,0,0.00125,0.6,0);
         // from 1002 Circuit Runners
-        FollowerConstants.drivePIDFCoefficients.setCoefficients(0.01,0,0.0002,0.6,0);
+        FollowerConstants.drivePIDFCoefficients.setCoefficients(0.01,0,0.000255,0.6,0);
         FollowerConstants.useSecondaryDrivePID = false;
-        FollowerConstants.secondaryDrivePIDFCoefficients.setCoefficients(0.1,0,0,0.6,0); // Not being used, @see useSecondaryDrivePID
+        FollowerConstants.secondaryDrivePIDFCoefficients.setCoefficients(0.1,0,0.0,0.6,0); // Not being used, @see useSecondaryDrivePID
         FollowerConstants.drivePIDFFeedForward = 0;
         FollowerConstants.driveKalmanFilterParameters.dataCovariance = 1;
         FollowerConstants.driveKalmanFilterParameters.modelCovariance = 6;
@@ -58,6 +58,6 @@ public class FConstants {
         FollowerConstants.pathEndTranslationalConstraint = 0.1;
         FollowerConstants.pathEndHeadingConstraint = 0.007;
 
-        FollowerConstants.maxPower = 1;
+        FollowerConstants.maxPower = 0.9;
     }
 }
